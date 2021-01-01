@@ -3,13 +3,12 @@ CC=gcc
 CFLAGS=-Wall -Wextra -std=c99 -pedantic \
        $(shell pkg-config --libs --cflags gtk+-3.0) \
        $(DEBUG)
-BINARY=test
-OBJECTS=main.o custom.o
+BINARY=main
+OBJECTS=custom.o
 
-default: all
+default: $(BINARY)
 
-all: $(OBJECTS)
-	$(CC) -o$(BINARY) $(OBJECTS) $(CFLAGS)
+$(BINARY): $(OBJECTS)
 
 %.o:
 
