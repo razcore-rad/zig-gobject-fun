@@ -1,6 +1,10 @@
 #include "custom.h"
 
-#define SCREENS_OF_TEXT	3
+/* touch */
+#define TOTAL_LINES_NUM	100
+
+/* do not touch */
+#define TOTAL_LINES	((unsigned int)TOTAL_LINES_NUM)
 
 struct _DemoWidget
 {
@@ -8,9 +12,24 @@ struct _DemoWidget
 
 	GtkAdjustment *vadjustment;
 	GtkEventController *scroll_event_controller;
+	GQueue *queue;
 };
 
 G_DEFINE_TYPE(DemoWidget, demo_widget, GTK_TYPE_DRAWING_AREA)
+
+/* PRIVATE DATA */
+
+/* data for draw_cb helpers. This is mostly just here because I'm lazy. */
+typedef struct {
+	DemoWidget *self;
+	cairo_t *cr;
+	GtkStyleContext *context;
+	PangoLayout *layout;
+	double width, height;
+	int char_height;
+	unsigned int lines_per_screen;
+	double vadj_value;
+} draw_data;
 
 /* PRIVATE METHODS */
 
@@ -41,9 +60,6 @@ scroll_event_controller_scroll_cb(GtkEventControllerScroll *controller,
 	DemoWidget *self = DEMO_WIDGET(user_data);
 	double value = gtk_adjustment_get_value(self->vadjustment);
 
-	g_debug("%s: dx: %f - dy: %f - value: %f - value + dy: %f",
-			__func__, dx, dy, value, value + dy);
-
 	gtk_adjustment_set_value(self->vadjustment,
 			value + dy);
 }
@@ -58,97 +74,137 @@ vadjustment_value_changed_cb(GtkAdjustment *adjustment,
 	gtk_widget_queue_draw(GTK_WIDGET(self));
 }
 
-static gboolean
-draw_cb(GtkWidget *widget, cairo_t *cr, gpointer data)
+/* draw_cb helper functions */
+static void
+draw_render_vscroll(draw_data *data)
 {
-	DemoWidget *self = DEMO_WIDGET(widget);
-	GtkStyleContext *context;
-	PangoLayout *layout;
-	double width, height;
-	int char_height;
-	int lines_per_screen;
-	double vadj_value;
-	double vscroll_factor;
-	int i, j;
+	double factor = -(data->vadj_value) * data->char_height;
 
-	(void)data;
+	cairo_translate(data->cr, 0, factor);
+}
 
-	context = gtk_widget_get_style_context(widget);
-	layout = gtk_widget_create_pango_layout(widget, NULL);
-	width = gtk_widget_get_allocated_width(widget);
-	height = gtk_widget_get_allocated_height(widget);
-
-	vadj_value = gtk_adjustment_get_value(self->vadjustment);
-
-	g_debug("%s: width: %f - height: %f",
-			__func__, width, height);
-
-	pango_layout_set_text(layout, "foo bar baz", -1);
-
-	char_height = get_character_height(layout);
-	lines_per_screen = height / char_height;
-
-	g_debug("char_height: %d", char_height);
-	g_debug("lines_per_screen: %d", lines_per_screen);
-
-	/* render vertical scrolling */
-	vscroll_factor = -vadj_value * char_height;
-	cairo_translate(cr, 0, vscroll_factor);
-	g_debug("%s: vscroll_factor: %f",
-			__func__, vscroll_factor);
-
-	/* draw the background */
-	gtk_render_background(context, cr,
+static void
+draw_background(draw_data *data)
+{
+	gtk_render_background(data->context, data->cr,
 			0,		// gdouble x,
 			0,		// gdouble y,
-			width,		// gdouble width,
-			height);	// gdouble height);
+			data->width,	// gdouble width,
+			data->height);	// gdouble height);
+}
 
-	/* draw our lines of text */
-	for (i = 0; i < lines_per_screen; ++i)
+static void
+draw_visible_lines(draw_data *data)
+{
+	DemoWidget *self = data->self;
+
+	g_debug("%s: lines_per_screen: %u",
+					__func__, data->lines_per_screen);
+
+	for (unsigned int i = 0;
+		i < MIN(g_queue_get_length(self->queue),
+			data->lines_per_screen);
+		++i)
 	{
-		char *str = g_strdup_printf("%d: foo bar baz", i + 1);
-		pango_layout_set_text(layout, str, -1);
-		gtk_render_layout(context, cr,
+		char *str =
+			g_queue_peek_nth(self->queue, i);
+
+		pango_layout_set_text(data->layout, str, -1);
+		gtk_render_layout(data->context, data->cr,
 				0,			// gdouble x,
-				i * char_height,	// gdouble y,
-				layout);
-		g_free(str);
+				i * data->char_height,	// gdouble y,
+				data->layout);
+	}
+}
+
+static void
+draw_render_next_line(draw_data *data)
+{
+	DemoWidget *self = data->self;
+	unsigned int qlength;
+	unsigned int threshold;
+
+	qlength = g_queue_get_length(self->queue);
+
+	if (qlength <= data->lines_per_screen) {
+			g_debug("%s: num of lines to render is less than or equal to "
+					"the number of lines per screen. No need to draw more.",
+							__func__);
+			return;
 	}
 
-	/* render one line ahead above and beyond the main screen. */
-	j = 0;
-	while (i + 1 <= gtk_adjustment_get_upper(self->vadjustment))
+	/* nb: we *want* the implicit conversion to an integer here. */
+	threshold = ABS(data->vadj_value);
+	/* peg it to the maximum index we'd ever want. */
+	threshold = MIN(threshold,
+					/* -1 because we want an *index* (0 counts as a number) */
+					qlength - data->lines_per_screen - 1);
+
+	g_debug("%s: num: threshold: %u",
+					__func__, threshold);
+
+	for (unsigned int count = 0; count <= threshold; ++count)
 	{
-		if (ABS(vscroll_factor) != 0 &&
-				ABS(vscroll_factor) / j + char_height > j)
-		{
-			char *str = g_strdup_printf("%d: foo bar baz", i + 1);
-			pango_layout_set_text(layout, str, -1);
-			gtk_render_layout(context, cr,
-					0,
-					i * char_height,
-					layout);
-			g_free(str);
-			++j;
-		}
-		++i;
+			char *str = g_queue_peek_nth(self->queue,
+							data->lines_per_screen + count);
+
+			g_return_if_fail(str);
+
+			pango_layout_set_text(data->layout, str, -1);
+
+			gtk_render_layout(data->context, data->cr,
+							0,									// gdouble x,
+							(data->lines_per_screen + count) *
+											data->char_height,	// gdouble y
+							data->layout);
 	}
+}
+
+static void
+draw_update_adjustment(draw_data *data)
+{
+	DemoWidget *self = data->self;
 
 	gtk_adjustment_configure(self->vadjustment,
 		/* gdouble value -- don't change here; that's done in the 
 		 * scroll_cb function. */
-			vadj_value,
+			data->vadj_value,
 		/* gdouble lower */
 			0.0,
 		/* gdouble upper */
-			lines_per_screen * SCREENS_OF_TEXT,
+			TOTAL_LINES,
 		/* gdouble step_increment, */
 			1.0,
 		/* gdouble page_increment, */
-			lines_per_screen - 1,
+			data->lines_per_screen - 1,
 		/* gdouble page_size); */
-			lines_per_screen);
+			data->lines_per_screen);
+}
+
+static gboolean
+draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user_data)
+{
+	draw_data data;
+
+	(void)user_data;	/* unused for now */
+
+	/* fill up data struct for helper functions. */
+	data.self = DEMO_WIDGET(widget);
+	data.cr = cr;
+	data.context = gtk_widget_get_style_context(widget);
+	data.layout = gtk_widget_create_pango_layout(widget, NULL);
+	data.width = gtk_widget_get_allocated_width(widget);
+	data.height = gtk_widget_get_allocated_height(widget);
+	data.vadj_value = gtk_adjustment_get_value(data.self->vadjustment);
+	data.char_height = get_character_height(data.layout);
+	data.lines_per_screen = data.height / data.char_height;
+
+	/* helpers */
+	draw_render_vscroll(&data);
+	draw_background(&data);
+	draw_visible_lines(&data);
+	draw_render_next_line(&data);
+	draw_update_adjustment(&data);
 
 	return GDK_EVENT_PROPAGATE;
 }
@@ -159,6 +215,16 @@ static void
 demo_widget_init(DemoWidget *self)
 {
 	gtk_widget_set_can_focus(GTK_WIDGET(self), TRUE);
+
+	/* queue */
+	self->queue = g_queue_new();
+	for (guint i = 0; i < TOTAL_LINES; ++i)
+	{
+		char *str =
+			g_strdup_printf("%d: foo bar baz", i + 1);
+
+		g_queue_push_tail(self->queue, str);
+	}
 
 	/* adjustment */
 	self->vadjustment = gtk_adjustment_new(0.0, 0.0, 0.0, 0.0, 0.0, 0.0);
@@ -200,8 +266,8 @@ demo_widget_dispose(GObject *object)
 }
 
 /* another stage of the destruction process. My understanding is that here, you
- * free items that are independent only; for things that have a reference to
- * 'self', you use dispose.
+ * free items that are independent only; for things that are ref-counted,
+ * use dispose.
  *
  * See:
  * https://developer.gnome.org/gobject/stable/howto-gobject-destruction.html
@@ -210,15 +276,15 @@ demo_widget_dispose(GObject *object)
 static void
 demo_widget_finalize(GObject *gobject)
 {
-	/* here, you would free stuff. I've got nuthin' for ya. */
+	DemoWidget *self = DEMO_WIDGET(gobject);
 
-	/* --- */
+	g_queue_free_full(self->queue, g_free);
 
-	/* Always chain up to the parent class; as with dispose(), finalize()
+	/* Boilerplate:
+	 * Always chain up to the parent class; as with dispose(), finalize()
 	 * is autogenerated and thus always guaranteed to exist on the parent's
 	 * class virtual function table
 	 */
-	
 	G_OBJECT_CLASS(demo_widget_parent_class)->finalize(gobject);
 }
 
@@ -237,4 +303,4 @@ demo_widget_new(void)
 	return g_object_new(DEMO_TYPE_WIDGET, NULL);
 }
 
-// vim: colorcolumn=80
+// vim: colorcolumn=80:tabstop=4
