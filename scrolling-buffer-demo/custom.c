@@ -106,14 +106,15 @@ draw_visible_lines(draw_data *data)
 			data->lines_per_screen);
 		++i)
 	{
-		char *str =
-			g_queue_peek_nth(self->queue, i);
+		PangoLayout *layout;
+		
+		layout = g_queue_peek_nth(self->queue, i);
+		g_return_if_fail(PANGO_IS_LAYOUT(layout));
 
-		pango_layout_set_text(data->layout, str, -1);
 		gtk_render_layout(data->context, data->cr,
-				0,			// gdouble x,
+				0,						// gdouble x,
 				i * data->char_height,	// gdouble y,
-				data->layout);
+				layout);
 	}
 }
 
@@ -145,18 +146,17 @@ draw_render_next_line(draw_data *data)
 
 	for (unsigned int count = 0; count <= threshold; ++count)
 	{
-			char *str = g_queue_peek_nth(self->queue,
-							data->lines_per_screen + count);
+		PangoLayout *layout;
 
-			g_return_if_fail(str);
+		layout = g_queue_peek_nth(self->queue,
+									data->lines_per_screen + count);
+		g_return_if_fail(PANGO_IS_LAYOUT(layout));
 
-			pango_layout_set_text(data->layout, str, -1);
-
-			gtk_render_layout(data->context, data->cr,
-							0,									// gdouble x,
-							(data->lines_per_screen + count) *
-											data->char_height,	// gdouble y
-							data->layout);
+		gtk_render_layout(data->context, data->cr,
+				0,									// gdouble x,
+				(data->lines_per_screen + count) *
+					data->char_height,				// gdouble y
+				layout);
 	}
 }
 
@@ -210,20 +210,32 @@ draw_cb(GtkWidget *widget, cairo_t *cr, gpointer user_data)
 }
 
 /* CONSTRUCTORS AND DESTRUCTORS */
-
+	
 static void
 demo_widget_init(DemoWidget *self)
 {
-	gtk_widget_set_can_focus(GTK_WIDGET(self), TRUE);
+	GtkWidget *widget = GTK_WIDGET(self);
+	GtkStyleContext *context = gtk_widget_get_style_context(widget);
 
-	/* queue */
+	/* initial setup */
+	gtk_widget_set_can_focus(widget, TRUE);
+
+	/* use the `.view' style class utilized by e.g. GtkTextView so we can
+	 * get theming for pseudo-classes like :selected for free. */
+	gtk_style_context_add_class(context, GTK_STYLE_CLASS_VIEW);
+
+	/* queue of PangoLayouts */
 	self->queue = g_queue_new();
-	for (guint i = 0; i < TOTAL_LINES; ++i)
+	for (unsigned int i = 0; i < TOTAL_LINES; ++i)
 	{
-		char *str =
-			g_strdup_printf("%d: foo bar baz", i + 1);
+		PangoLayout *layout;
+		char *str;
 
-		g_queue_push_tail(self->queue, str);
+		str = g_strdup_printf("%d: foo bar baz", i + 1);
+		layout = gtk_widget_create_pango_layout(widget, str);
+
+		g_queue_push_tail(self->queue, layout);
+		g_free(str);
 	}
 
 	/* adjustment */
@@ -231,7 +243,7 @@ demo_widget_init(DemoWidget *self)
 
 	/* scroll event controller */
 	self->scroll_event_controller =
-		gtk_event_controller_scroll_new(GTK_WIDGET(self),
+		gtk_event_controller_scroll_new(widget,
 				GTK_EVENT_CONTROLLER_SCROLL_VERTICAL);
 
 	/* SIGNALS */
@@ -254,7 +266,7 @@ demo_widget_dispose(GObject *object)
 {
 	DemoWidget *self = DEMO_WIDGET(object);
 
-	/* destructors go here */
+	/* nothing here for now. */
 	(void)self;
 
 	/* Boilerplate.
@@ -278,7 +290,10 @@ demo_widget_finalize(GObject *gobject)
 {
 	DemoWidget *self = DEMO_WIDGET(gobject);
 
-	g_queue_free_full(self->queue, g_free);
+	/* dispose queue of PangoLayouts. This can't be done safely in _dispose
+	 * as g_queue_free_full can't take a function that takes a double
+	 * pointer to pass g_clear_object */
+	g_queue_free_full(self->queue, g_object_unref);
 
 	/* Boilerplate:
 	 * Always chain up to the parent class; as with dispose(), finalize()
@@ -303,4 +318,4 @@ demo_widget_new(void)
 	return g_object_new(DEMO_TYPE_WIDGET, NULL);
 }
 
-// vim: colorcolumn=80:tabstop=4
+// vim: colorcolumn=80:tabstop=4:shiftwidth=4
