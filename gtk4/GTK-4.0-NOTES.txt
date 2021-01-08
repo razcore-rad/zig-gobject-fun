@@ -1,0 +1,31 @@
+GTK 4.0 NOTES
+====
+
+gtk_widget_get_next_sibling - docs aren't clear on this -- idea is that you
+can keep running it on the retval, and it will return NULL when no more
+children. -- here's an example:
+
+    /* queue draw functions for children */
+    for (child = gtk_widget_get_first_child (widget);
+            child != NULL;
+            child = gtk_widget_get_next_sibling (child))
+    {
+        gtk_widget_snapshot_child (widget, child, snapshot);
+    }
+
+gtk_widget_set_name --> allows you to access the widget "name" via CSS using
+the '#' - eg, if name is set to 'pathbarbox':
+
+filechooser {
+  .dialog-action-box {
+    border-top: 1px solid $borders_color;
+  }
+
+  #pathbarbox { border-bottom: 1px solid $bg_color; }
+}
+
+gtk_widget now has a "can-focus" *in addition to* the "focusable" property
+that was present in gtk3 (fixme: and 2?) - the docs are *really* not clear on
+the difference. There should at least be a note that the one is not to be
+confused with the other. In order to make a plain gtkwidget accept input focus
+now, you *need* to do set_focusable
