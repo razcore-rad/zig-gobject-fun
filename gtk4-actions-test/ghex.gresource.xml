@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- vim:ts=4 sw=4
+-->
+
+<gresources>
+	<gresource prefix="/org/gnome/ghex">
+		<file preprocess="xml-stripblanks" compressed="true">ghex-application-window.ui</file>
+	</gresource>
+</gresources>
