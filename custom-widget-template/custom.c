@@ -1,8 +1,10 @@
+/* vim: colorcolumn=80 ts=4 sw=4
+ */
 /* What this is, is an extremely simple annotated .c file that implements a
  * custom widget in gtk3 with gobject. All it does is subclasses GtkDrawingArea
  * and creates a blank widget. 
  *
- * Requires: glib >= 2.44
+ * Requires: glib >= 2.44, gtk3 >= 3.20 (3.24.x recommended)
  *
  * This is a template for a FINAL (as opposed to DERIVABLE gobject type.
  * Final types are simpler. You do most of the work in the C file and just
@@ -18,19 +20,33 @@
 
 #include "custom.h"
 
+/* This is not strictly necessary as we've kept things in a naturally working
+ * order below. But G_DEFINE_TYPE does *not* provide declarations for these
+ * destructor functions, so if you change the order of the constructors and
+ * destructors defined below, you'll get an error.
+ */
+
+/* INTERNAL DECLARATIONS */
+
+static void demo_widget_dispose (GObject *object);
+static void demo_widget_finalize (GObject *object);
+
 /* First, create the main struct that has the guts of the object in it.
  * It must follow this template in the tag; otherwise it won't be recognized
  * by the gobject macros.
  */
+
+/* GOBJECT DEFINITION */
 
 struct _DemoWidget {
 	/* subclass type - be sure you do *not* use a pointer. Keep this as the
 	 * first member. */
 	GtkDrawingArea parent_instance;
 
-	/* custom meat & potatoes go here. Eg: */
-	// GtkWidget *button;
-	// GtkWidget *entry;
+	/* custom meat & potatoes go here. Eg:
+	 * GtkWidget *button;
+	 * GtkWidget *entry;
+	 */
 };
 
 /* once the main struct is defined as above, here is hte next macro. Make sure
@@ -42,7 +58,7 @@ struct _DemoWidget {
  * GtkDrawingArea, so that type macro is specified below.
  */
 
-G_DEFINE_TYPE(DemoWidget, demo_widget, GTK_TYPE_DRAWING_AREA)
+G_DEFINE_TYPE (DemoWidget, demo_widget, GTK_TYPE_DRAWING_AREA)
 
 /* this function is used to build the widget. Note that although the docs refer
  * to something as the 'instance_init' function, the subroutine is actually
@@ -50,20 +66,24 @@ G_DEFINE_TYPE(DemoWidget, demo_widget, GTK_TYPE_DRAWING_AREA)
  */
 
 static void
-demo_widget_init(DemoWidget *self) {
+demo_widget_init (DemoWidget *self)
+{
 	/* Initialize anything needed here. Eg: */
 	// self->button = gtk_button_new(...);
 }
 
 /* This is one stage of the destructor process along with _finalize.
- * Here, you more-so destruct items that have a `self` attached, as
- * opposed to being independent.
+ * Here, you more-so destruct items that are ref-counted (eg, GObject-y
+ * stuff) as opposed to being independent (like a string, or a FILE *
+ * pointer, which should be freed / fclosed as opposed to being unreffed).
  *
  * See also:
  * https://developer.gnome.org/gobject/stable/howto-gobject-destruction.html
  */
 
-static void demo_widget_dispose(GObject *object) {
+static void
+demo_widget_dispose (GObject *object)
+{
 	DemoWidget *self = DEMO_WIDGET(object);
 
 	/* Boilerplate:
@@ -75,15 +95,16 @@ static void demo_widget_dispose(GObject *object) {
 }
 
 /* Another stage of the destruction process. My understanding is that here,
- * you free items that are independent only; for things that have a reference to
- * 'self', you use dispose.
+ * you free items that are independent only; see _finalize above for more info.
  *
  * See:
  * https://developer.gnome.org/gobject/stable/howto-gobject-destruction.html
- * for a description of the nuances.
+ * for a description of the nuances between _dispose and _finalize.
  */
 
-static void demo_widget_finalize(GObject *gobject) {
+static void
+demo_widget_finalize (GObject *gobject)
+{
 	/* here, you would free stuff. I've got nuthin' for ya. */
 
 	/* --- */
@@ -96,7 +117,7 @@ static void demo_widget_finalize(GObject *gobject) {
 	G_OBJECT_CLASS(demo_widget_parent_class)->finalize(gobject);
 }
 
-/* this subroutine gets run the first time the class is *ever* utilized but not
+/* this method gets run the first time the class is *ever* utilized but not
  * again.
  *
  * See:
@@ -108,7 +129,9 @@ static void demo_widget_finalize(GObject *gobject) {
  * using the token `class' on its own which is a c++ reserved word.
  */
 
-static void demo_widget_class_init(DemoWidgetClass *klass) {
+static void
+demo_widget_class_init (DemoWidgetClass *klass)
+{
 	/* <boilerplate> */
 	GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
@@ -119,8 +142,17 @@ static void demo_widget_class_init(DemoWidgetClass *klass) {
 
 /* and finally, here's the actual definition of our public function to create
  * an instance of our object which is... completely boilerplate!
+ *
+ * There are some circumstances where this will not be boilerplate; for
+ * instance, if you've subclassed GtkApplicationWindow and want to take `app`
+ * as an argument during your `activate` function. You'll then want to look
+ * at what types of properties the objects you've subclassed can handle, and
+ * then look to the docs for g_object_new() as to how to set those in your
+ * _new method.
  */
 
-GtkWidget *demo_widget_new(void) {
-	return g_object_new(DEMO_TYPE_WIDGET, NULL);
+GtkWidget *
+demo_widget_new (void)
+{
+	return g_object_new (DEMO_TYPE_WIDGET, NULL);
 }

@@ -12,7 +12,7 @@ G_DECLARE_FINAL_TYPE(DemoWidget, demo_widget, DEMO, WIDGET, GtkDrawingArea)
 
 /* Method declarations */
 
-GtkWidget *demo_widget_new(void);
+GtkWidget *	demo_widget_new(void);
 
 G_END_DECLS
 
