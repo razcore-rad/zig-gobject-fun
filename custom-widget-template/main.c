@@ -3,7 +3,7 @@
 /* main.c:  Boilerplate stub to view our demo widget.
  */
 
-#include "custom.h"
+#include "demowidget.h"
 
 static void
 activate (GtkApplication *app, gpointer user_data)
@@ -18,8 +18,8 @@ activate (GtkApplication *app, gpointer user_data)
 
 	gtk_window_set_title (GTK_WINDOW(window), "Window");
 	gtk_window_set_default_size (GTK_WINDOW(window), 400, 400);
-	gtk_container_add (GTK_CONTAINER(window), demo);
-	gtk_widget_show_all (window);
+	gtk_window_set_child (GTK_WINDOW(window), demo);
+	gtk_widget_show (window);
 }
 
 int

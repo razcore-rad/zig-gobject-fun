@@ -1,10 +1,10 @@
 DEBUG=-g
 CC=gcc
-CFLAGS=-Wall -Wextra -std=c99 -pedantic \
-       $(shell pkg-config --libs --cflags gtk+-3.0) \
+CFLAGS=-Wall -Wextra -std=c11 -pedantic \
+       $(shell pkg-config --libs --cflags gtk4) \
        $(DEBUG)
 BINARY=main
-OBJECTS=custom.o
+OBJECTS=demowidget.o
 
 default: $(BINARY)
 
