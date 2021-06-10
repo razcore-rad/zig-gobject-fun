@@ -93,7 +93,7 @@ demo_widget_dispose (GObject *object)
 {
 	DemoWidget *self = DEMO_WIDGET(object);
 
-	gtk_widget_unparent (GTK_WIDGET(self->button));
+	g_clear_pointer (&self->button, gtk_widget_unparent);
 
 	/* Final step: Chain up */
 
