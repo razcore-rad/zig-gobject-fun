@@ -15,8 +15,20 @@ activate (GtkApplication *app, gpointer user_data)
 
 	window = gtk_application_window_new (app);
 
+	/* Instantiate new DemoWidget */
+
 	demo = demo_widget_new();
-	demo_widget_set_label (DEMO_WIDGET(demo), "Blah blah blah");
+
+	/* Set label of DemoWidget using the standard GObject setter: */
+
+	g_object_set (demo,
+			"label", "foo bar baz",
+			NULL);
+
+	/* Roughly equivalent to:
+	 *
+	 * demo_widget_set_label (DEMO_WIDGET(demo), "foo bar baz");
+	 */
 
 	gtk_window_set_title (GTK_WINDOW(window), "Window");
 	gtk_window_set_default_size (GTK_WINDOW(window), 400, 400);

@@ -4,11 +4,11 @@
 
 /* GLOBALS FOR PROPERTIES */
 
-typedef enum
+enum
 {
 	PROP_LABEL = 1,
 	N_PROPERTIES
-} DemoWidgetProperty;
+};
 
 static GParamSpec *properties[N_PROPERTIES];
 
@@ -119,8 +119,8 @@ static void
 demo_widget_class_init (DemoWidgetClass *klass)
 {
 	GObjectClass *object_class = G_OBJECT_CLASS(klass);
-	GParamFlags prop_flags = G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS |
-		G_PARAM_EXPLICIT_NOTIFY;
+	GParamFlags default_flags =
+		G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY;
 
 	/* map vfuncs */
 
@@ -135,7 +135,7 @@ demo_widget_class_init (DemoWidgetClass *klass)
 			"Button label",
 			"Textual label for our lovely button",
 			/* default: */	"Hello, world!",
-			prop_flags);
+			default_flags);
 
 	g_object_class_install_properties (object_class, N_PROPERTIES, properties);
 
