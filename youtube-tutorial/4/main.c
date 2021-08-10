@@ -43,6 +43,10 @@ activate (GtkApplication *app, gpointer user_data)
 	/* Connect to our custom signal */
 	g_signal_connect (demo, "foobar", G_CALLBACK(foobar_cb), NULL);
 
+	/* Connect button signal to toggle widget label selection on and off */
+	g_signal_connect_swapped (button, "clicked",
+			G_CALLBACK(demo_widget_toggle_selection), demo);
+
 	/* Setup Window */
 	gtk_window_set_title (GTK_WINDOW(window), "Window");
 	gtk_window_set_default_size (GTK_WINDOW(window), 400, 400);
