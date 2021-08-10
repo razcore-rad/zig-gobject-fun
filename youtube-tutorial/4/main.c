@@ -6,7 +6,7 @@
 #include "demowidget.h"
 
 static void
-foobar_cb (DemoWidget *demo, gpointer user_data)
+demo_toggled_cb (DemoWidget *demo, gpointer user_data)
 {
 	g_print ("DemoWidget says hello.\n");
 }
@@ -41,7 +41,7 @@ activate (GtkApplication *app, gpointer user_data)
 			NULL);
 	
 	/* Connect to our custom signal */
-	g_signal_connect (demo, "foobar", G_CALLBACK(foobar_cb), NULL);
+	g_signal_connect (demo, "toggled", G_CALLBACK(demo_toggled_cb), NULL);
 
 	/* Connect button signal to toggle widget label selection on and off */
 	g_signal_connect_swapped (button, "clicked",

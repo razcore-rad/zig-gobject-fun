@@ -15,7 +15,7 @@ static GParamSpec *properties[N_PROPERTIES];
 /* GLOBALS FOR SIGNALS */
 
 enum signal_types {
-	FOOBAR,
+	TOGGLED,
 	LAST_SIGNAL
 };
 
@@ -262,7 +262,7 @@ demo_widget_class_init (DemoWidgetClass *klass)
 
 	/* signals */
 
-	signals[FOOBAR] = g_signal_new_class_handler ("foobar",
+	signals[TOGGLED] = g_signal_new_class_handler ("toggled",
 			G_OBJECT_CLASS_TYPE (object_class),
 			G_SIGNAL_RUN_LAST,
 		/* no default C function */
@@ -311,6 +311,7 @@ demo_widget_toggle_selection (DemoWidget *self)
 {
 	self->label_selected = self->label_selected ? FALSE : TRUE;
 	gtk_widget_queue_draw (GTK_WIDGET(self));
+	g_signal_emit (self, signals[TOGGLED], 0);
 }
 
 GtkWidget *
