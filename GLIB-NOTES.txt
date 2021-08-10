@@ -1,0 +1,7 @@
+NOTES FOR FUTURE DOCS MR TO GLIB
+====
+
+g_file_set_contents ()
+
+	"This is a convenience wrapper around calling g_file_set_contents()
+with..." -- should be "wrapper around **g_file_set_contents_full()**"

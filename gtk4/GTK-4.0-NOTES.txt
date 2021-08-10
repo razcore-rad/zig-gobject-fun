@@ -29,3 +29,37 @@ that was present in gtk3 (fixme: and 2?) - the docs are *really* not clear on
 the difference. There should at least be a note that the one is not to be
 confused with the other. In order to make a plain gtkwidget accept input focus
 now, you *need* to do set_focusable
+
+
+GtkDialog -- GtkBuilder
+----
+
+docs aren't clear on this.
+
+you can do <child type="action"> but not "content".
+
+to access content area say <child internal-child="content_area">
+
+GtkSwitch - docs tell you not to connect to a certain signal to see if the
+switch state has changed and to connect to the "notify::state" signal - but
+this is not documented. I believe "notify::" is a generic prefix that lets you
+be notified of property changes, and 'state' is the property we're looking to
+be notified about.
+
+gdk_content_provider_get_value ()
+----
+
+"Gets the contents of provider stored in value ."
+
+should be "to be stored in value" or something. It does look *for* contents of
+a provider stored *already in* a GValue - it fills up a GValue with the
+requested GType, as initialized, if it exists.
+
+eg:
+
+  GValue value = G_VALUE_INIT;                                                 
+
+  g_value_init (&value, GDK_TYPE_PAINTABLE);                                   
+
+  if (!gdk_content_provider_get_value (content, &value, NULL))                 
+    return;
