@@ -35,14 +35,15 @@ struct _DemoWidget
 	GtkWidget parent_instance;
 
 	char *label;
+	GtkGesture *gesture;
 };
 
 G_DEFINE_TYPE (DemoWidget, demo_widget, GTK_TYPE_WIDGET)
 
+
 /* PRIVATE INTERNAL FUNCTIONS */
 
-
-/* PROPERTIES - GETTERS AND SETTERS */
+/* Properties - Getters and Setters */
 
 static void
 demo_widget_set_property (GObject *object,
@@ -136,7 +137,22 @@ demo_widget_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 			layout);
 }
 
-/* METHOD DEFINITIONS */
+/* Callbacks */
+
+static void
+gesture_released_cb (GtkGestureClick *gesture,
+		int n_press,
+		double x,
+		double y,
+		gpointer user_data)
+{
+	DemoWidget *self = DEMO_WIDGET(user_data);
+
+	g_debug ("%s: clicked - n_press: %d - x: %f - y: %f",
+			__func__, n_press, x, y);
+}
+
+/* CONSTRUCTORS AND DESTRUCTORS */
 
 static void
 demo_widget_init (DemoWidget *self)
@@ -144,12 +160,21 @@ demo_widget_init (DemoWidget *self)
 	GtkWidget *widget = GTK_WIDGET(self);
 	
 	gtk_widget_set_name (widget, "demowidget");
+
+	/* Setup gesture */
+	self->gesture = gtk_gesture_click_new ();
+	g_signal_connect (self->gesture, "released",
+			G_CALLBACK(gesture_released_cb), self);
+	gtk_widget_add_controller (widget, GTK_EVENT_CONTROLLER(self->gesture));
 }
 
 static void
 demo_widget_dispose (GObject *object)
 {
 	DemoWidget *self = DEMO_WIDGET(object);
+
+	/* nb: no need to destroy the GtkEventController (ie Gesture) according
+	 * to TFM. */
 
 	/* Final step: Chain up */
 
@@ -213,6 +238,8 @@ demo_widget_class_init (DemoWidgetClass *klass)
 	gtk_widget_class_set_layout_manager_type (GTK_WIDGET_CLASS(klass),
 			GTK_TYPE_BOX_LAYOUT);
 }
+
+/* PUBLIC METHOD DEFINITIONS */
 
 void
 demo_widget_set_label (DemoWidget *self, const char *label)
