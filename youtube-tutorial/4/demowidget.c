@@ -297,6 +297,8 @@ demo_widget_set_label (DemoWidget *self, const char *label)
 	self->layout_rect.width = label_width / PANGO_SCALE;
 	self->layout_rect.height = label_height / PANGO_SCALE;
 
+	gtk_widget_queue_draw (GTK_WIDGET(self));
+
 	g_object_notify_by_pspec (G_OBJECT(self), properties[PROP_LABEL]);
 }
 
