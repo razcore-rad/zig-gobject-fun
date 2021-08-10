@@ -15,5 +15,6 @@ G_DECLARE_FINAL_TYPE(DemoWidget, demo_widget, DEMO, WIDGET, GtkWidget)
 
 GtkWidget *		demo_widget_new (void);
 void 			demo_widget_set_label (DemoWidget *self, const char *label);
+const char *	demo_widget_get_label (DemoWidget *self);
 
 G_END_DECLS

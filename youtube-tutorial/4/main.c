@@ -15,16 +15,25 @@ static void
 activate (GtkApplication *app, gpointer user_data)
 {
 	GtkWidget *window;
+	GtkWidget *box;
 	GtkWidget *demo;
+	GtkWidget *button;
 
 	(void)user_data;	/* unused */
 
 	window = gtk_application_window_new (app);
 
-	/* Instantiate new DemoWidget */
+	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 6);
+	gtk_box_set_homogeneous (GTK_BOX(box), TRUE);
+
+	button = gtk_button_new_with_label ("Yo");
 
 	demo = demo_widget_new ();
+	gtk_widget_set_hexpand (demo, TRUE);
 
+	gtk_box_append (GTK_BOX(box), demo);
+	gtk_box_append (GTK_BOX(box), button);
+	
 	/* Set label of DemoWidget using the standard GObject setter: */
 
 	g_object_set (demo,
@@ -34,9 +43,10 @@ activate (GtkApplication *app, gpointer user_data)
 	/* Connect to our custom signal */
 	g_signal_connect (demo, "foobar", G_CALLBACK(foobar_cb), NULL);
 
+	/* Setup Window */
 	gtk_window_set_title (GTK_WINDOW(window), "Window");
 	gtk_window_set_default_size (GTK_WINDOW(window), 400, 400);
-	gtk_window_set_child (GTK_WINDOW(window), demo);
+	gtk_window_set_child (GTK_WINDOW(window), box);
 	gtk_widget_show (window);
 }
 

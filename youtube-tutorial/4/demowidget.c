@@ -33,6 +33,8 @@ static void demo_widget_finalize (GObject *object);
 struct _DemoWidget
 {
 	GtkWidget parent_instance;
+
+	char *label;
 };
 
 G_DEFINE_TYPE (DemoWidget, demo_widget, GTK_TYPE_WIDGET)
@@ -74,7 +76,7 @@ demo_widget_get_property (GObject *object,
 	switch (property_id)
 	{
 		case PROP_LABEL:
-			g_debug ("%s: PROP_LABEL: NOT IMPLEMENTED", __func__);
+			g_value_set_string (value, demo_widget_get_label (self));
 			break;
 
 		default:
@@ -95,23 +97,20 @@ demo_widget_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 	GtkStyleContext *context;
 	/* Raw text-rendering object used with GTK */
 	PangoLayout *layout;
-	/* Cairo object to do cairo drawing with */
-	cairo_t *cr;
 	/* Same as a GdkRectangle; struct of ints: { x, y, width, height } */
 	GtkAllocation allocation;
 
-	layout = gtk_widget_create_pango_layout (widget,
-			"Hello, world!"	/* can be NULL */
-			);
+	layout = gtk_widget_create_pango_layout (widget, NULL);
+	pango_layout_set_text (layout, demo_widget_get_label (self), -1);
 
 	context = gtk_widget_get_style_context (widget);
+	gtk_style_context_add_class (context, "view");
 
 	provider = gtk_css_provider_new ();
+
 	gtk_css_provider_load_from_data (provider,
-			"#demowidget {\n"
-			"  border-style: solid;\n"
-			"  border-width: 10px;\n"
-			"  border-color: black;\n"
+			"* {\n"
+			"  border: 5px solid blue;\n"
 			"}\n",
 			-1);
 
@@ -121,22 +120,17 @@ demo_widget_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 
 	gtk_widget_get_allocation (widget, &allocation);
 
-	cr = gtk_snapshot_append_cairo (snapshot,
-			&GRAPHENE_RECT_INIT (0, 0, allocation.width, allocation.height)
-			);
-
-
 	/* ------------------------------ */
 	/* Draw our background and layout */
 	/* ------------------------------ */
 
-	gtk_render_background (context, cr,
+	gtk_snapshot_render_background (snapshot, context,
 			/* double x, */			allocation.x,
 			/* double y, */			allocation.y,
 			/* double width, */		allocation.width,
 			/* double height */		allocation.height);
 
-	gtk_render_layout (context, cr,
+	gtk_snapshot_render_layout (snapshot, context,
 			/* double x, */			allocation.x,
 			/* double y, */			allocation.y,
 			layout);
@@ -223,8 +217,16 @@ demo_widget_class_init (DemoWidgetClass *klass)
 void
 demo_widget_set_label (DemoWidget *self, const char *label)
 {
-	g_debug ("%s: NOT IMPLEMENTED", __func__);
+	g_clear_pointer (&self->label, g_free);
+	self->label = g_strdup (label);
+
 	g_object_notify_by_pspec (G_OBJECT(self), properties[PROP_LABEL]);
+}
+
+const char *
+demo_widget_get_label (DemoWidget *self)
+{
+	return self->label;
 }
 
 GtkWidget *
