@@ -139,7 +139,7 @@ demo_widget_snapshot (GtkWidget *widget, GtkSnapshot *snapshot)
 	provider = gtk_css_provider_new ();
 
 	gtk_css_provider_load_from_data (provider,
-			"* {\n"
+			"#demowidget {\n"
 			"  border: 5px solid red;\n"
 			"}\n",
 			-1);
