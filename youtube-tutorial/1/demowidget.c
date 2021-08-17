@@ -108,7 +108,7 @@ demo_widget_dispose (GObject *object)
  * for a description of the nuances between _dispose and _finalize.
  */
 static void
-demo_widget_finalize (GObject *gobject)
+demo_widget_finalize (GObject *object)
 {
 	/* here, you would free stuff. I've got nuthin' for ya. */
 
