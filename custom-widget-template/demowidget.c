@@ -119,7 +119,7 @@ demo_widget_finalize (GObject *object)
 	 * virtual function table
 	 */
 	
-	G_OBJECT_CLASS(demo_widget_parent_class)->finalize(gobject);
+	G_OBJECT_CLASS(demo_widget_parent_class)->finalize(object);
 }
 
 /* this method gets run the first time the class is *ever* utilized but not
