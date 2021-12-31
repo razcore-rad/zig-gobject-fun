@@ -1,0 +1,20 @@
+<!-- vim: ts=2 sw=2 expandtab foldmethod=indent
+-->
+
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <template class="DemoWidget" parent="GtkWidget">
+    <child>
+      <object class="GtkFrame" id="frame">
+        <property name="label">Pane</property>
+        <property name="hexpand">true</property>
+        <child>
+          <object class="GtkBox" id="frame_box">
+            <property name="orientation">horizontal</property>
+            <property name="spacing">6</property>
+          </object>
+        </child>
+      </object>
+    </child>
+  </template>
+</interface>

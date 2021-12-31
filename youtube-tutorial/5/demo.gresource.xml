@@ -1,0 +1,5 @@
+<gresources>
+	<gresource prefix="/">
+		<file>demo-widget.ui</file>
+	</gresource>
+</gresources>
