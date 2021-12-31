@@ -23,16 +23,20 @@ static guint signals[LAST_SIGNAL];
 
 /* GOBJECT DEFINITION */
 
+/* G_DECLARE_DERIVABLE_TYPE already did something like this:
 struct _DemoWidget
 {
 	GtkWidget parent_instance;
+};
+*/
 
-	/* Will be set by the template - names need to marry up with IDs in .ui file */
+typedef struct
+{
 	GtkWidget *frame;
 	GtkWidget *frame_box;
-};
+} DemoWidgetPrivate;
 
-G_DEFINE_TYPE (DemoWidget, demo_widget, GTK_TYPE_WIDGET)
+G_DEFINE_TYPE_WITH_PRIVATE (DemoWidget, demo_widget, GTK_TYPE_WIDGET)
 
 /* PROPERTIES - GETTERS AND SETTERS */
 
@@ -92,8 +96,10 @@ static void
 demo_widget_dispose (GObject *object)
 {
 	DemoWidget *self = DEMO_WIDGET(object);
+								/* generated from macro */
+	DemoWidgetPrivate *priv = demo_widget_get_instance_private (self);
 
-	g_clear_pointer (&self->frame, gtk_widget_unparent);
+	g_clear_pointer (&priv->frame, gtk_widget_unparent);
 
 	/* Chain up */
 	G_OBJECT_CLASS(demo_widget_parent_class)->dispose (object);
@@ -123,8 +129,8 @@ demo_widget_class_init (DemoWidgetClass *klass)
 	/* TEMPLATE */
 
 	gtk_widget_class_set_template_from_resource (widget_class, "/demo-widget.ui");
-	gtk_widget_class_bind_template_child (widget_class, DemoWidget, frame);
-	gtk_widget_class_bind_template_child (widget_class, DemoWidget, frame_box);
+	gtk_widget_class_bind_template_child_private (widget_class, DemoWidget, frame);
+	gtk_widget_class_bind_template_child_private (widget_class, DemoWidget, frame_box);
 
 	/* LAYOUT MANAGER */
 
