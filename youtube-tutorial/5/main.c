@@ -1,28 +1,26 @@
-/* vim: colorcolumn=80 ts=4 sw=4
- */
-/* main.c:  Boilerplate stub to view our demo widget.
- */
+// vim: colorcolumn=80 ts=4 sw=4
 
-#include "demo-widget.h"
+#include "demo-animal.h"
 
 static void
 activate (GtkApplication *app, gpointer user_data)
 {
 	GtkWidget *window;
 	GtkWidget *box;
-	GtkWidget *demo;
+	GtkWidget *animal;
 
 	window = gtk_application_window_new (app);
 	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
+	animal = demo_animal_new ();
 
-	demo = demo_widget_new ();
-	gtk_widget_set_hexpand (demo, TRUE);
-
-	gtk_box_append (GTK_BOX(box), demo);
+	gtk_widget_set_hexpand (animal, TRUE);
+	gtk_box_append (GTK_BOX(box), animal);
 	
+	/* Setup Window */
 	gtk_window_set_title (GTK_WINDOW(window), "Window");
-	gtk_window_set_default_size (GTK_WINDOW(window), 400, 200);
+	gtk_window_set_default_size (GTK_WINDOW(window), 400, 400);
 	gtk_window_set_child (GTK_WINDOW(window), box);
+
 	gtk_widget_show (window);
 }
 
