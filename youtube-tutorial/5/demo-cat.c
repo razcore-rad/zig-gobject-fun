@@ -125,6 +125,10 @@ demo_cat_class_init (DemoCatClass *klass)
 	object_class->set_property = demo_cat_set_property;
 	object_class->get_property = demo_cat_get_property;
 
+	/* Map DemoAnimalClass virtual 'make_sound' function to a real function
+	 * implemented here in DemoCat -- note: see what happens if we don't
+	 * implement/map this and try to make animal make sound!
+	 */
 	DEMO_ANIMAL_CLASS(object_class)->make_sound = demo_cat_real_make_sound;
 
 #if 0

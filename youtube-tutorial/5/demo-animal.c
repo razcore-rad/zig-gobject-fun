@@ -145,3 +145,17 @@ demo_animal_new (void)
 {
 	return g_object_new (DEMO_TYPE_ANIMAL, NULL);
 }
+
+void
+demo_animal_make_sound	(DemoAnimal *self, guint count)
+{
+	g_return_if_fail (DEMO_IS_ANIMAL (self));
+
+	/* If the method is purely virtual, a sanity check like this is recommended
+	 * to avoid crashes if the method is not implemented by a child. Instead,
+	 * glib2 will issue a runtime warning.
+	 */
+	g_return_if_fail (DEMO_ANIMAL_GET_CLASS (self)->make_sound != NULL);
+
+	DEMO_ANIMAL_GET_CLASS (self)->make_sound (self, count);
+}

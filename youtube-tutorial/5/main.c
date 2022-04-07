@@ -16,8 +16,8 @@ activate (GtkApplication *app, gpointer user_data)
 	{
 		char *name;
 
-		/* Test making our animal's sound -- NOT the recommended methodology. */
-		DEMO_ANIMAL_GET_CLASS (cat)->make_sound (DEMO_ANIMAL(cat), 3);
+		/* Test making our animal's sound -- cleaner method. */
+		demo_animal_make_sound (DEMO_ANIMAL(cat), 5);
 	}
 
 	gtk_widget_set_hexpand (cat, TRUE);

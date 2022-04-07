@@ -29,6 +29,7 @@ struct _DemoAnimalClass
 
 /* Method declarations */
 
-GtkWidget *	demo_animal_new (void);
+GtkWidget *		demo_animal_new (void);
+void			demo_animal_make_sound	(DemoAnimal *self, guint count);
 
 G_END_DECLS
