@@ -1,20 +1,20 @@
 // vim: colorcolumn=80 ts=4 sw=4
 
-#include "demo-animal.h"
+#include "demo-cat.h"
 
 static void
 activate (GtkApplication *app, gpointer user_data)
 {
 	GtkWidget *window;
 	GtkWidget *box;
-	GtkWidget *animal;
+	GtkWidget *cat;
 
 	window = gtk_application_window_new (app);
 	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-	animal = demo_animal_new ();
+	cat = demo_cat_new ();
 
-	gtk_widget_set_hexpand (animal, TRUE);
-	gtk_box_append (GTK_BOX(box), animal);
+	gtk_widget_set_hexpand (cat, TRUE);
+	gtk_box_append (GTK_BOX(box), cat);
 	
 	/* Setup Window */
 	gtk_window_set_title (GTK_WINDOW(window), "Window");

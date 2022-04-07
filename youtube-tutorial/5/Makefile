@@ -4,7 +4,7 @@ CFLAGS=-Wall -Wextra -Wno-unused-parameter -Wno-unused-variable -std=c11 -pedant
        $(shell pkg-config --libs --cflags gtk4) \
        $(DEBUG)
 BINARY=main
-OBJECTS=demo-animal.o
+OBJECTS=demo-animal.o demo-cat.o
 
 default: $(BINARY)
 
