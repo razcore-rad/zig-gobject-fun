@@ -74,6 +74,21 @@ demo_cat_get_property (GObject *object,
 	}
 }
 
+/* VIRTUAL FUNCTION IMPLEMENTATIONS */
+
+static void
+demo_cat_real_make_sound (DemoAnimal *animal, guint count)
+{
+	if (! count)
+		return;
+
+	for (guint i = 0; i < count; ++i)
+	{
+		g_print ("Meow ");
+	}
+	g_print("\n");
+}
+
 /* METHOD DEFINITIONS */
 
 static void
@@ -109,6 +124,8 @@ demo_cat_class_init (DemoCatClass *klass)
 
 	object_class->set_property = demo_cat_set_property;
 	object_class->get_property = demo_cat_get_property;
+
+	DEMO_ANIMAL_CLASS(object_class)->make_sound = demo_cat_real_make_sound;
 
 #if 0
 	/* PROPERTIES */

@@ -3,15 +3,6 @@
 #include "demo-cat.h"
 
 static void
-print_cat_name (const char *name)
-{
-	if (! name)
-		g_print ("Your cat has no name.\n");
-	else
-		g_print ("Your cat's name is: %s\n", name);
-}
-
-static void
 activate (GtkApplication *app, gpointer user_data)
 {
 	GtkWidget *window;
@@ -25,15 +16,8 @@ activate (GtkApplication *app, gpointer user_data)
 	{
 		char *name;
 
-		/* Test printing our cat's name before and after setting the "name"
-		 * property. Note that "name" is a property of DemoAnimal, and not
-		 * specifically of DemoCat.
-		 */
-		g_object_get (cat, "name", &name, NULL);
-		print_cat_name (name);
-		g_object_set (cat, "name", "Jeepers", NULL);
-		g_object_get (cat, "name", &name, NULL);
-		print_cat_name (name);
+		/* Test making our animal's sound -- NOT the recommended methodology. */
+		DEMO_ANIMAL_GET_CLASS (cat)->make_sound (DEMO_ANIMAL(cat), 3);
 	}
 
 	gtk_widget_set_hexpand (cat, TRUE);
