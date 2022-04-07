@@ -162,3 +162,9 @@ demo_cat_new (void)
 {
 	return g_object_new (DEMO_TYPE_CAT, NULL);
 }
+
+void
+demo_cat_purr (DemoCat *cat)
+{
+	g_print ("Prrrrrr!\n");
+}

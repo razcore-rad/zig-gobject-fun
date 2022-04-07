@@ -18,6 +18,9 @@ activate (GtkApplication *app, gpointer user_data)
 
 		/* Test making our animal's sound -- cleaner method. */
 		demo_animal_make_sound (DEMO_ANIMAL(cat), 5);
+
+		/* Unique kitty cat animal method! */
+		demo_cat_purr (DEMO_CAT(cat));
 	}
 
 	gtk_widget_set_hexpand (cat, TRUE);
