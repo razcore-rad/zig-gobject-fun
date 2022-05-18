@@ -1,7 +1,21 @@
-NOTES FOR FUTURE DOCS MR TO GLIB
-====
+GLIB2 NOTES
+===========
 
-g_file_set_contents ()
+GTask
+-----
 
-	"This is a convenience wrapper around calling g_file_set_contents()
-with..." -- should be "wrapper around **g_file_set_contents_full()**"
+g_task_propagate_* --> does NOT take a ref on the task
+g_task_return_* --> TAKES a ref
+
+GTask calls the GDestroyNotify function of your *data* upon finalization. So
+you shouldn't free it yourself - you'll get a double free.
+
+_propagate_* also sets a flag called result_destroy to false - I'm a bit
+confused by that - but I think what it means is - since _propagate_* doesn't
+take a ref, it's up to you to call g_object_unref on it in your _cb function
+that calls _finish. I think that if the operation fails somewhere along the
+way, it will free your stuff for you.
+
+Re: the _unreffing of the task in the cb function that calls finish: this
+seems to be correct. gdb has confirmed this. I haven't seen many projects
+actually do this though except evolution-data-server.
