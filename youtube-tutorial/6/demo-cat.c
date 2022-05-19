@@ -6,7 +6,7 @@
 
 enum
 {
-	PROP_ONE = 1,
+	FED = 1,
 	N_PROPERTIES
 };
 
@@ -33,6 +33,7 @@ struct _DemoCat
 	GtkWidget *speech_bubble;
 	GtkWidget *speech_bubble_label;
 	guint speech_bubble_timer;
+	gboolean fed;
 };
 
 G_DEFINE_TYPE (DemoCat, demo_cat, DEMO_TYPE_ANIMAL)
@@ -49,8 +50,9 @@ demo_cat_set_property (GObject *object,
 
 	switch (property_id)
 	{
-		case PROP_ONE:
-			/* --- */
+		case FED:
+			self->fed = g_value_get_boolean (value);
+			g_object_notify_by_pspec (object, properties[FED]);
 			break;
 
 		default:
@@ -70,8 +72,8 @@ demo_cat_get_property (GObject *object,
 
 	switch (property_id)
 	{
-		case PROP_ONE:
-			/* --- */
+		case FED:
+			g_value_set_boolean (value, self->fed);
 			break;
 
 		default:
@@ -218,17 +220,14 @@ demo_cat_class_init (DemoCatClass *klass)
 			1,
 			G_TYPE_INT);
 
-#if 0
 	/* PROPERTIES */
 
-	properties[PROP_ONE] = g_param_spec_string ("property-one",
-			"Property one",
-			"Our lovely first property",
-			/* default: */	"Hello, world!",
+	properties[FED] = g_param_spec_boolean ("fed",
+			NULL, NULL,			/* No nick or blurb: recent recommendation. */
+			FALSE,				/* default */
 			G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
 
 	g_object_class_install_properties (object_class, N_PROPERTIES, properties);
-#endif
 }
 
 /* PUBLIC METHOD DEFINITIONS */
