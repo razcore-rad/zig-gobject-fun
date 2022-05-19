@@ -104,7 +104,8 @@ speech_bubble_timeout (gpointer user_data)
 
 	gtk_revealer_set_reveal_child (GTK_REVEALER(self->speech_bubble_revealer), FALSE);
 
-	return G_SOURCE_CONTINUE;
+	self->speech_bubble_timer = 0;
+	return G_SOURCE_REMOVE;
 }
 
 /* VIRTUAL FUNCTION IMPLEMENTATIONS */
@@ -117,6 +118,10 @@ demo_cat_real_make_sound (DemoAnimal *animal, guint count)
 
 	if (! count)
 		return;
+
+	if (self->speech_bubble_timer)
+		g_source_remove (self->speech_bubble_timer);
+	self->speech_bubble_timer = g_timeout_add_seconds (5, speech_bubble_timeout, self);
 
 	gtk_revealer_set_reveal_child (GTK_REVEALER(self->speech_bubble_revealer),
 			TRUE);
@@ -164,8 +169,6 @@ demo_cat_init (DemoCat *self)
 	drag = gtk_gesture_drag_new ();
 	gtk_widget_add_controller (self->cat_image, GTK_EVENT_CONTROLLER(drag));
 	g_signal_connect_swapped (drag, "drag-end", G_CALLBACK(emit_pet), self);
-
-	self->speech_bubble_timer = g_timeout_add (5000, speech_bubble_timeout, self);
 }
 
 static void
