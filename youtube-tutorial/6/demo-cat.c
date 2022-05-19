@@ -188,6 +188,9 @@ demo_cat_dispose (GObject *object)
 {
 	DemoCat *self = DEMO_CAT(object);
 
+	/* Clean up after ourselves. This gets rid of our runtime warning. */
+	g_clear_pointer (&self->grid, gtk_widget_unparent);
+
 	/* Chain up */
 	G_OBJECT_CLASS(demo_cat_parent_class)->dispose (object);
 }
@@ -196,6 +199,9 @@ static void
 demo_cat_finalize (GObject *object)
 {
 	DemoCat *self = DEMO_CAT(object);
+
+	if (self->speech_bubble_timer)
+		g_source_remove (self->speech_bubble_timer);
 
 	/* Chain up */
 	G_OBJECT_CLASS(demo_cat_parent_class)->finalize (object);

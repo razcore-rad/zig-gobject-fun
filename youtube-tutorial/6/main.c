@@ -29,27 +29,29 @@ activate (GtkApplication *app, gpointer user_data)
 	GtkWidget *window;
 	GtkWidget *box;
 	GtkWidget *cat;
+	GtkWidget *feed_button;
 
-	window = gtk_application_window_new (app);
-	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
-	cat = demo_cat_new ();
-
-	g_signal_connect (cat, "pet", G_CALLBACK(pet_cat_cb), NULL);
-
-	/* you can do notify::[property] or any gobject property. Very useful!
+	/* Setup our widgets for our window. Note that this can get unwieldy!
+	 * As an exercise, try doing something similar to this using a .ui file.
 	 */
-	g_signal_connect (cat, "notify::fed", G_CALLBACK(fed_cat_cb), NULL);
+	window = gtk_application_window_new (app);
+	box = gtk_box_new (GTK_ORIENTATION_VERTICAL, 0);
+	cat = demo_cat_new ();
+	feed_button = gtk_button_new_with_mnemonic ("_Feed the Kitty!!");
 
 	gtk_widget_set_hexpand (cat, TRUE);
+	gtk_widget_set_vexpand (cat, TRUE);
+	gtk_widget_set_hexpand (feed_button, FALSE);
+	gtk_widget_set_halign (feed_button, GTK_ALIGN_START);
+
+	gtk_box_append (GTK_BOX(box), feed_button);
 	gtk_box_append (GTK_BOX(box), cat);
 
-	/* Still doing the feeding in the context of test code. So there likely
-	 * won't be a noticeable difference at this stage.
-	 */
-	{
-		demo_cat_feed (DEMO_CAT(cat));
-	}
-	
+	/* Setup signals */
+	g_signal_connect (cat, "pet", G_CALLBACK(pet_cat_cb), NULL);
+	g_signal_connect_swapped (feed_button, "clicked", G_CALLBACK(demo_cat_feed), cat);
+	g_signal_connect (cat, "notify::fed", G_CALLBACK(fed_cat_cb), NULL);
+
 	/* Setup Window */
 	gtk_window_set_title (GTK_WINDOW(window), "Window");
 	gtk_window_set_default_size (GTK_WINDOW(window), 700, 600);
