@@ -15,12 +15,10 @@ pet_cat_cb (DemoCat *cat, int enjoyment_factor, gpointer user_data)
 	demo_animal_make_sound (DEMO_ANIMAL(cat), enjoyment_factor);
 }
 
-/* This is the standard prototype for a notify:: signal callback */
+/* Can modify prototype like so, to clean up code a bit. */
 static void
-fed_cat_cb (GObject *gobject, GParamSpec *pspec, gpointer user_data)
+fed_cat_cb (DemoCat *cat, GParamSpec *pspec, gpointer user_data)
 {
-	DemoCat *cat = DEMO_CAT (gobject);
-
 	if (demo_cat_get_fed (cat))
 		demo_cat_purr (cat);
 }

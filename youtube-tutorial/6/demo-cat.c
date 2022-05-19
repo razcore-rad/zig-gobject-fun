@@ -38,6 +38,10 @@ struct _DemoCat
 
 G_DEFINE_TYPE (DemoCat, demo_cat, DEMO_TYPE_ANIMAL)
 
+/* PRIVATE FORWARD DECLARATIONS */
+
+static void setup_speech_bubble (DemoCat *self);
+
 /* PROPERTIES - GETTERS AND SETTERS */
 
 static void
@@ -110,6 +114,17 @@ speech_bubble_timeout (gpointer user_data)
 	return G_SOURCE_REMOVE;
 }
 
+static void
+setup_speech_bubble (DemoCat *self)
+{
+	if (self->speech_bubble_timer)
+		g_source_remove (self->speech_bubble_timer);
+	self->speech_bubble_timer = g_timeout_add_seconds (5, speech_bubble_timeout, self);
+
+	gtk_revealer_set_reveal_child (GTK_REVEALER(self->speech_bubble_revealer),
+			TRUE);
+}
+
 /* VIRTUAL FUNCTION IMPLEMENTATIONS */
 
 static void
@@ -121,12 +136,7 @@ demo_cat_real_make_sound (DemoAnimal *animal, guint count)
 	if (! count)
 		return;
 
-	if (self->speech_bubble_timer)
-		g_source_remove (self->speech_bubble_timer);
-	self->speech_bubble_timer = g_timeout_add_seconds (5, speech_bubble_timeout, self);
-
-	gtk_revealer_set_reveal_child (GTK_REVEALER(self->speech_bubble_revealer),
-			TRUE);
+	setup_speech_bubble (self);
 
 	for (guint i = 0; i < count; ++i)
 	{
@@ -241,7 +251,9 @@ demo_cat_new (void)
 void
 demo_cat_purr (DemoCat *cat)
 {
-	g_print ("Prrrrrr!\n");
+	setup_speech_bubble (cat);
+	gtk_label_set_text (GTK_LABEL(cat->speech_bubble_label),
+			"Prrrrrrrrrrrrrrrrr!");
 }
 
 void
