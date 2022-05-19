@@ -20,27 +20,32 @@
 			</object>
 		</child>
 		<child>
-			<object class="GtkBox" id="speech_bubble">
-				<property name="orientation">horizontal</property>
-				<property name="name">speech-bubble</property>
+			<object class="GtkRevealer" id="speech_bubble_revealer">
+				<property name="transition-type">swing-up</property>
 				<layout>
 					<property name="column">2</property>
 					<property name="row">0</property>
 				</layout>
-				<child><object class="GtkDrawingArea">
-						<property name="width-request">50</property>
-						<property name="hexpand">false</property>
-				</object></child>
-				<child><object class="GtkLabel" id="speech_bubble_label">
-						<property name="wrap">true</property>
-						<property name="yalign">0.25</property>
-						<property name="xalign">0.25</property>
-				</object></child>
-				<child><object class="GtkDrawingArea">
-						<property name="width-request">50</property>
-						<property name="hexpand">false</property>
-				</object></child>
-			</object> <!-- box -->
+				<child>
+					<object class="GtkBox" id="speech_bubble">
+						<property name="orientation">horizontal</property>
+						<property name="name">speech-bubble</property>
+						<child><object class="GtkDrawingArea">
+								<property name="width-request">50</property>
+								<property name="hexpand">false</property>
+						</object></child>
+						<child><object class="GtkLabel" id="speech_bubble_label">
+								<property name="wrap">true</property>
+								<property name="yalign">0.25</property>
+								<property name="xalign">0.25</property>
+						</object></child>
+						<child><object class="GtkDrawingArea">
+								<property name="width-request">50</property>
+								<property name="hexpand">false</property>
+						</object></child>
+					</object> <!-- box -->
+				</child>
+			</object> <!-- revealer -->
 		</child>
 </object>
 

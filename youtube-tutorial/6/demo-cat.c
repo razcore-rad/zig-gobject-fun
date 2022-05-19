@@ -15,7 +15,7 @@ static GParamSpec *properties[N_PROPERTIES];
 /* GLOBALS FOR SIGNALS */
 
 enum signal_types {
-	SIGNAL_ONE,
+	PET,
 	LAST_SIGNAL
 };
 
@@ -29,6 +29,7 @@ struct _DemoCat
 
 	GtkWidget *grid;
 	GtkWidget *cat_image;
+	GtkWidget *speech_bubble_revealer;
 	GtkWidget *speech_bubble;
 	GtkWidget *speech_bubble_label;
 };
@@ -79,6 +80,14 @@ demo_cat_get_property (GObject *object,
 	}
 }
 
+/* PRIVATE FUNCTIONS */
+
+static void
+emit_pet (DemoCat *self)
+{
+	g_signal_emit (self, signals[PET], 0);
+}
+
 /* VIRTUAL FUNCTION IMPLEMENTATIONS */
 
 static void
@@ -89,6 +98,9 @@ demo_cat_real_make_sound (DemoAnimal *animal, guint count)
 
 	if (! count)
 		return;
+
+	gtk_revealer_set_reveal_child (GTK_REVEALER(self->speech_bubble_revealer),
+			TRUE);
 
 	for (guint i = 0; i < count; ++i)
 	{
@@ -106,9 +118,11 @@ demo_cat_init (DemoCat *self)
 	GtkBuilder *builder = gtk_builder_new_from_file ("demo-cat.ui");
 	GtkCssProvider *provider;
 	GtkStyleContext *context;
+	GtkGesture *drag;
 
 	self->grid = GTK_WIDGET(gtk_builder_get_object (builder, "grid"));
 	self->cat_image = GTK_WIDGET(gtk_builder_get_object (builder, "cat_image"));
+	self->speech_bubble_revealer = GTK_WIDGET(gtk_builder_get_object (builder, "speech_bubble_revealer"));
 	self->speech_bubble = GTK_WIDGET(gtk_builder_get_object (builder, "speech_bubble"));
 	self->speech_bubble_label = GTK_WIDGET(gtk_builder_get_object (builder, "speech_bubble_label"));
 
@@ -127,6 +141,10 @@ demo_cat_init (DemoCat *self)
 	gtk_style_context_add_provider (context,
 			GTK_STYLE_PROVIDER(provider),
 			GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+
+	drag = gtk_gesture_drag_new ();
+	gtk_widget_add_controller (GTK_WIDGET(self), GTK_EVENT_CONTROLLER(drag));
+	g_signal_connect_swapped (drag, "drag-end", G_CALLBACK(emit_pet), self);
 }
 
 static void
@@ -161,6 +179,18 @@ demo_cat_class_init (DemoCatClass *klass)
 
 	DEMO_ANIMAL_CLASS(object_class)->make_sound = demo_cat_real_make_sound;
 
+	/* SIGNALS */
+
+	signals[PET] = g_signal_new_class_handler ("pet",
+			G_OBJECT_CLASS_TYPE (object_class),
+			G_SIGNAL_RUN_LAST,
+		/* no default C function */
+			NULL,
+		/* defaults for accumulator, marshaller &c. */
+			NULL, NULL, NULL,	
+		/* No return type or params. */
+			G_TYPE_NONE, 0);
+
 #if 0
 	/* PROPERTIES */
 
@@ -171,17 +201,6 @@ demo_cat_class_init (DemoCatClass *klass)
 			G_PARAM_READWRITE | G_PARAM_STATIC_STRINGS | G_PARAM_EXPLICIT_NOTIFY);
 
 	g_object_class_install_properties (object_class, N_PROPERTIES, properties);
-	/* SIGNALS */
-
-	signals[SIGNAL_ONE] = g_signal_new_class_handler ("signal-one",
-			G_OBJECT_CLASS_TYPE (object_class),
-			G_SIGNAL_RUN_LAST,
-		/* no default C function */
-			NULL,
-		/* defaults for accumulator, marshaller &c. */
-			NULL, NULL, NULL,	
-		/* No return type or params. */
-			G_TYPE_NONE, 0);
 #endif
 }
 

@@ -2,6 +2,19 @@
 
 #include "demo-cat.h"
 
+/* nb: There is also a way to do this without a using a callback if
+ * you know some special trickery with GObject... Note that the prototype
+ * for a 'pet' callback takes 2 parameters, and the first will be a DemoCat
+ * which will also have to be a DemoAnimal. What if we could then marshall
+ * the user_data pointer into an integer which demo_animal_make_sound could
+ * accept?
+ */
+static void
+pet_cat_cb (DemoCat *cat, gpointer user_data)
+{
+	demo_animal_make_sound (DEMO_ANIMAL(cat), 10);
+}
+
 static void
 activate (GtkApplication *app, gpointer user_data)
 {
@@ -13,13 +26,7 @@ activate (GtkApplication *app, gpointer user_data)
 	box = gtk_box_new (GTK_ORIENTATION_HORIZONTAL, 0);
 	cat = demo_cat_new ();
 
-	/* Test functions. */
-	{
-		demo_animal_make_sound (DEMO_ANIMAL(cat), 10);
-
-		/* Unique kitty cat animal method! */
-		demo_cat_purr (DEMO_CAT(cat));
-	}
+	g_signal_connect (cat, "pet", G_CALLBACK(pet_cat_cb), NULL);
 
 	gtk_widget_set_hexpand (cat, TRUE);
 	gtk_box_append (GTK_BOX(box), cat);
