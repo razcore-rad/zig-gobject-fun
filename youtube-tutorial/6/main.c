@@ -28,17 +28,13 @@ activate (GtkApplication *app, gpointer user_data)
 
 	g_signal_connect (cat, "pet", G_CALLBACK(pet_cat_cb), NULL);
 
-
 	gtk_widget_set_hexpand (cat, TRUE);
 	gtk_box_append (GTK_BOX(box), cat);
 
 	{
-		gboolean cat_is_fed = FALSE;
+		demo_cat_feed (DEMO_CAT(cat));
 
-		g_object_set (cat, "fed", TRUE, NULL);
-		g_object_get (cat, "fed", &cat_is_fed, NULL);
-
-		if (cat_is_fed)
+		if (demo_cat_get_fed (DEMO_CAT(cat)))
 			demo_cat_purr (DEMO_CAT(cat));
 	}
 	

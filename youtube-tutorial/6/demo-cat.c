@@ -243,3 +243,16 @@ demo_cat_purr (DemoCat *cat)
 {
 	g_print ("Prrrrrr!\n");
 }
+
+void
+demo_cat_feed (DemoCat *cat)
+{
+	g_object_set (cat, "fed", TRUE, NULL);
+}
+
+/* A bit nicer API, and less overhead than a g_object_get call. */
+gboolean
+demo_cat_get_fed (DemoCat *cat)
+{
+	return cat->fed;
+}

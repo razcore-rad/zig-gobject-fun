@@ -15,5 +15,7 @@ G_DECLARE_FINAL_TYPE (DemoCat, demo_cat, DEMO, CAT, DemoAnimal)
 
 GtkWidget *	demo_cat_new (void);
 void		demo_cat_purr (DemoCat *self);
+void		demo_cat_feed (DemoCat *cat);
+gboolean	demo_cat_get_fed (DemoCat *cat);
 
 G_END_DECLS
