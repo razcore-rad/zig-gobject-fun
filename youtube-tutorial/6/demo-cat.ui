@@ -21,7 +21,7 @@
 		</child>
 		<child>
 			<object class="GtkRevealer" id="speech_bubble_revealer">
-				<property name="transition-type">swing-up</property>
+				<property name="transition-type">crossfade</property>
 				<layout>
 					<property name="column">2</property>
 					<property name="row">0</property>

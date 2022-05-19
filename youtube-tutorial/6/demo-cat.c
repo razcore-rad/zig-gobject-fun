@@ -32,6 +32,7 @@ struct _DemoCat
 	GtkWidget *speech_bubble_revealer;
 	GtkWidget *speech_bubble;
 	GtkWidget *speech_bubble_label;
+	guint speech_bubble_timer;
 };
 
 G_DEFINE_TYPE (DemoCat, demo_cat, DEMO_TYPE_ANIMAL)
@@ -95,6 +96,17 @@ emit_pet (DemoCat *self, double offset_x, double offset_y)
 	g_signal_emit (self, signals[PET], 0, enjoyment_factor);
 }
 
+/* GSourceFunc */
+static gboolean
+speech_bubble_timeout (gpointer user_data)
+{
+	DemoCat *self = DEMO_CAT (user_data);
+
+	gtk_revealer_set_reveal_child (GTK_REVEALER(self->speech_bubble_revealer), FALSE);
+
+	return G_SOURCE_CONTINUE;
+}
+
 /* VIRTUAL FUNCTION IMPLEMENTATIONS */
 
 static void
@@ -152,6 +164,8 @@ demo_cat_init (DemoCat *self)
 	drag = gtk_gesture_drag_new ();
 	gtk_widget_add_controller (self->cat_image, GTK_EVENT_CONTROLLER(drag));
 	g_signal_connect_swapped (drag, "drag-end", G_CALLBACK(emit_pet), self);
+
+	self->speech_bubble_timer = g_timeout_add (5000, speech_bubble_timeout, self);
 }
 
 static void
