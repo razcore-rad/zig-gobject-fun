@@ -10,9 +10,9 @@
  * accept?
  */
 static void
-pet_cat_cb (DemoCat *cat, gpointer user_data)
+pet_cat_cb (DemoCat *cat, int enjoyment_factor, gpointer user_data)
 {
-	demo_animal_make_sound (DEMO_ANIMAL(cat), 10);
+	demo_animal_make_sound (DEMO_ANIMAL(cat), enjoyment_factor);
 }
 
 static void

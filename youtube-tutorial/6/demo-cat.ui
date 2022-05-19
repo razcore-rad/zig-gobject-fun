@@ -9,7 +9,7 @@
 		<property name="column-homogeneous">true</property>
 
 		<child>
-			<object class="GtkImage" id="cat">
+			<object class="GtkImage" id="cat_image">
 				<property name="file">demo-cat.svg</property>
 				<property name="hexpand">true</property>
 				<property name="vexpand">true</property>

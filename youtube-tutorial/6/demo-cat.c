@@ -83,9 +83,16 @@ demo_cat_get_property (GObject *object,
 /* PRIVATE FUNCTIONS */
 
 static void
-emit_pet (DemoCat *self)
+emit_pet (DemoCat *self, double offset_x, double offset_y)
 {
-	g_signal_emit (self, signals[PET], 0);
+	int enjoyment_factor;
+
+	/* Calculate an 'enjoyment factor' based on how long the pet of the cat
+	 * was. Since a really small pet can lead to a zero, clamp it at 1.
+	 */
+	enjoyment_factor = MAX ((ABS(offset_x) + ABS(offset_y)) / 20, 1);
+
+	g_signal_emit (self, signals[PET], 0, enjoyment_factor);
 }
 
 /* VIRTUAL FUNCTION IMPLEMENTATIONS */
@@ -143,7 +150,7 @@ demo_cat_init (DemoCat *self)
 			GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
 
 	drag = gtk_gesture_drag_new ();
-	gtk_widget_add_controller (GTK_WIDGET(self), GTK_EVENT_CONTROLLER(drag));
+	gtk_widget_add_controller (self->cat_image, GTK_EVENT_CONTROLLER(drag));
 	g_signal_connect_swapped (drag, "drag-end", G_CALLBACK(emit_pet), self);
 }
 
@@ -188,8 +195,11 @@ demo_cat_class_init (DemoCatClass *klass)
 			NULL,
 		/* defaults for accumulator, marshaller &c. */
 			NULL, NULL, NULL,	
-		/* No return type or params. */
-			G_TYPE_NONE, 0);
+		/* No return type */
+			G_TYPE_NONE,
+		/* 1 param: enjoyment factor (integer) */
+			1,
+			G_TYPE_INT);
 
 #if 0
 	/* PROPERTIES */
