@@ -1,0 +1,12 @@
+#speech-bubble {
+	/* nb: You must use an absolute path here! Please change to the proper
+	 * path on your system for this demo.
+	 * Obviously, it is not ideal to specify absolute path like this;
+	 * we'll show how to fix this soon. */
+	background-image: url("file:///home/logan/git/gobject-fun/youtube-tutorial/6/speech-bubble.svg");
+	background-size: cover;
+	font: 14pt "Comic Sans MS";
+	margin-top: 12px;
+	margin-left: 6px;
+	margin-right: 6px;
+}

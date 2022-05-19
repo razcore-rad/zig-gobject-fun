@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- vim: ts=2 sw=2 foldmethod=indent
+-->
+
+<interface domain="gtk40">
+	<object class="GtkGrid" id="grid">
+		<property name="row-homogeneous">true</property>
+		<property name="column-homogeneous">true</property>
+
+		<child>
+			<object class="GtkImage" id="cat">
+				<property name="file">demo-cat.svg</property>
+				<property name="hexpand">true</property>
+				<property name="vexpand">true</property>
+				<layout>
+					<property name="column">1</property>
+					<property name="row">1</property>
+				</layout>
+			</object>
+		</child>
+		<child>
+			<object class="GtkBox" id="speech_bubble">
+				<property name="orientation">horizontal</property>
+				<property name="name">speech-bubble</property>
+				<layout>
+					<property name="column">2</property>
+					<property name="row">0</property>
+				</layout>
+				<child><object class="GtkDrawingArea">
+						<property name="width-request">50</property>
+						<property name="hexpand">false</property>
+				</object></child>
+				<child><object class="GtkLabel" id="speech_bubble_label">
+						<property name="wrap">true</property>
+						<property name="yalign">0.25</property>
+						<property name="xalign">0.25</property>
+				</object></child>
+				<child><object class="GtkDrawingArea">
+						<property name="width-request">50</property>
+						<property name="hexpand">false</property>
+				</object></child>
+			</object> <!-- box -->
+		</child>
+</object>
+
+</interface>
