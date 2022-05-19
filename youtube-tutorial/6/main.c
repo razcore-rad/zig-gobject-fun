@@ -15,6 +15,16 @@ pet_cat_cb (DemoCat *cat, int enjoyment_factor, gpointer user_data)
 	demo_animal_make_sound (DEMO_ANIMAL(cat), enjoyment_factor);
 }
 
+/* This is the standard prototype for a notify:: signal callback */
+static void
+fed_cat_cb (GObject *gobject, GParamSpec *pspec, gpointer user_data)
+{
+	DemoCat *cat = DEMO_CAT (gobject);
+
+	if (demo_cat_get_fed (cat))
+		demo_cat_purr (cat);
+}
+
 static void
 activate (GtkApplication *app, gpointer user_data)
 {
@@ -28,14 +38,18 @@ activate (GtkApplication *app, gpointer user_data)
 
 	g_signal_connect (cat, "pet", G_CALLBACK(pet_cat_cb), NULL);
 
+	/* you can do notify::[property] or any gobject property. Very useful!
+	 */
+	g_signal_connect (cat, "notify::fed", G_CALLBACK(fed_cat_cb), NULL);
+
 	gtk_widget_set_hexpand (cat, TRUE);
 	gtk_box_append (GTK_BOX(box), cat);
 
+	/* Still doing the feeding in the context of test code. So there likely
+	 * won't be a noticeable difference at this stage.
+	 */
 	{
 		demo_cat_feed (DEMO_CAT(cat));
-
-		if (demo_cat_get_fed (DEMO_CAT(cat)))
-			demo_cat_purr (DEMO_CAT(cat));
 	}
 	
 	/* Setup Window */
