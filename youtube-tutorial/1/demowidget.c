@@ -152,19 +152,22 @@ demo_widget_finalize (GObject *object)
  * c++ reserved word. You could call it something else like 'gclass' if you'd
  * like, but it has idiomatically been called 'klass' for 20+ years, so it's
  * probably best to just stick with that.
- *
- * Again, since for now we are just creating a blank widget, we can just
- * leave this function blank for now. As with _init, it needs to be defined
- * in some fashion, though.
  */
 static void
 demo_widget_class_init (DemoWidgetClass *klass)
 {
+	/* Establish a shorthand to avoid some casts. */
 	GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
+	/* Map the dispose and finalize 'virtual functions' to the functions
+	 * we defined above.
+	 */
 	object_class->dispose = demo_widget_dispose;
 	object_class->finalize = demo_widget_finalize;
 
+	/* Tell our widget which type of 'layout manager' to use so it knows
+	 * how to arrange the widgets. Box type is a good default.
+	 */
 	gtk_widget_class_set_layout_manager_type (GTK_WIDGET_CLASS(klass),
 			GTK_TYPE_BOX_LAYOUT);
 }
