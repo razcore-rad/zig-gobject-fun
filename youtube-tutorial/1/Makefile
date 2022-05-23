@@ -11,7 +11,5 @@ default: $(BINARY)
 
 $(BINARY): $(OBJECTS)
 
-%.o:
-
 clean:
 	rm -f $(OBJECTS) $(BINARY)
