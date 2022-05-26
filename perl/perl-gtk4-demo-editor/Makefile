@@ -22,4 +22,13 @@ uninstall:
 	rm -rf $(DESTDIR)$(DATADIR)
 	if test "x$(DESTDIR)" = "x"; then glib-compile-schemas $(SCHEMADIR); fi
 
-.PHONY: install uninstall
+install-local-schema:
+	install -d -m 755 ~/.local/share/glib-2.0/schemas
+	install -m 644 com.example.MyApp.gschema.xml ~/.local/share/glib-2.0/schemas
+	glib-compile-schemas ~/.local/share/glib-2.0/schemas
+
+uninstall-local-schema:
+	rm -f ~/.local/share/glib-2.0/schemas/com.example.MyApp.gschema.xml
+	glib-compile-schemas ~/.local/share/glib-2.0/schemas
+
+.PHONY: install uninstall install-local-schema uninstall-local-schema
