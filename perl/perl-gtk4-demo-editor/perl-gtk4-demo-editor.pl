@@ -82,6 +82,14 @@ sub about_action
 	$about->show ();
 }
 
+sub new_action
+{
+	my $widgetsref = shift;
+	my $buffer = $$widgetsref{textview}->get_buffer ();
+
+	$buffer->set_text ("", 0);
+}
+
 sub open_action
 {
 	my $widgetsref = shift;
@@ -165,6 +173,9 @@ sub setup_settings
 
 	my $settings = Glib::IO::Settings->new ("com.example.MyApp");
 	$app->add_action ($settings->create_action ("color"));
+
+	# WORKAROUND https://gitlab.gnome.org/GNOME/gtk/-/issues/4880 - focus on save-as dialogs
+	Gtk4::Settings::get_default()->set ("gtk-dialogs-use-header", 1);
 }
 
 sub setup_actions
@@ -178,6 +189,7 @@ sub setup_actions
 		$app_actions{$_} = Glib::IO::SimpleAction->new ($_);
 	}
 
+	$app_actions{new}->signal_connect_swapped (activate => \&new_action, $widgetsref);
 	$app_actions{open}->signal_connect_swapped (activate => \&open_action, $widgetsref);
 	$app_actions{'save-as'}->signal_connect_swapped (activate => \&save_as_action, $widgetsref);
 	$app_actions{quit}->signal_connect_swapped (activate => \&quit_action, $app);
