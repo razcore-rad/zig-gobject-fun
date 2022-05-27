@@ -7,7 +7,7 @@
         <item>
           <attribute name="label" translatable="yes">_New</attribute>
           <attribute name="action">app.new</attribute>
-          <attribute name="accel">&lt;Control&gt;n</attribute>
+	  <!--          <attribute name="accel">&lt;Control&gt;n</attribute> -->
         </item>
         <item>
           <attribute name="label" translatable="yes">_Open</attribute>

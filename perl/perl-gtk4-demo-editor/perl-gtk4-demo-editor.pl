@@ -403,6 +403,13 @@ sub setup_actions
 	}
 }
 
+sub setup_accels
+{
+	my $app = shift;
+
+	$app->set_accels_for_action ("app.new", ['<Ctrl>n']);
+}
+
 sub activate_cb
 {
 	my $app = shift;
@@ -422,6 +429,7 @@ sub activate_cb
 	setup_css (\%widgets);
 	setup_settings ($app);
 	setup_actions ($app, \%widgets);
+	setup_accels ($app);
 
 	# add window to app and display.
 	
