@@ -139,6 +139,10 @@ sub quit_action
 	{
 		$app->quit ();
 	}
+
+	# let this double up as a close-request signal handler.
+	# Neither Perl nor GTK seem to complain about incompatible return types, so... yay?
+	return 1;
 }
 
 sub about_action
@@ -420,6 +424,7 @@ sub activate_cb
 
 	# add window to app and display.
 	
+	$widgets{appwindow}->signal_connect_swapped ('close-request' => \&quit_action, \%widgets);
 	$app->add_window ($widgets{appwindow});
 	$widgets{appwindow}->show ();
 }
