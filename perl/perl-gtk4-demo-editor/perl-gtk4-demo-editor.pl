@@ -165,6 +165,7 @@ sub new_action
 	my $do_new = sub {
 		$buffer->set_text ("", 0);
 		$buffer->set_modified (0);
+		$$widgetsref{appwindow}{file} = undef;
 		update_titlebar ($widgetsref);
 	};
 
