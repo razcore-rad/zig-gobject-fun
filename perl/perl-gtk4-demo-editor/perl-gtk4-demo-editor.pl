@@ -406,8 +406,25 @@ sub setup_actions
 sub setup_accels
 {
 	my $app = shift;
+	my %accels = (
+		'app.new' => ['<Ctrl>n'],
+		'app.save' => ['<Ctrl>s'],
+		'app.save-as' => ['<Ctrl><Shift>s'],
+		'app.quit' => ['<Ctrl>q'],
+		'app.color::red' => ['<Ctrl>r'],
+		'app.color::green' => ['<Ctrl>g'],
+		'app.color::blue' => ['<Ctrl>b'],
+		'win.shape::square' => ['<Ctrl><Shift>s'],
+		'win.shape::rectangle' => ['<Ctrl><Shift>r'],
+		'win.shape::oval' => ['<Ctrl><Shift>o'],
+		'win.bold' => ['<Ctrl><Shift>b'],
+		'win.about' => ['<Ctrl><Shift>a'],
+	);
 
-	$app->set_accels_for_action ("app.new", ['<Ctrl>n']);
+	for my $action (keys %accels)
+	{
+		$app->set_accels_for_action ($action, $accels{$action});
+	}
 }
 
 sub activate_cb
