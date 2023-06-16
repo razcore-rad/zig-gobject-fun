@@ -1,6 +1,8 @@
 # Zig - GTK4 Exploration
 
-> [The original C repo](https://gitlab.com/LARathbone/gobject-fun).
+> [The original C repo](https://gitlab.com/LARathbone/gobject-fun)
+
+> The Zig-conversion code lives in `youtube-tutorial`.
 
 [Zig](https://ziglang.org) has the capability to [translate C code to Zig](https://ziglang.org/documentation/master/#toc-C-Translation-CLI) code using a CLI tool via `zig translate-c` or in code with the built-in function `@cImport()`.
 

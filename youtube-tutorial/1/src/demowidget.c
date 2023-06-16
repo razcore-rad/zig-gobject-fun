@@ -2,9 +2,9 @@
 
 /* This is an extremely simple annotated .c file that implements a custom
  * widget in gtk4 with gobject. All it does is subclasses GtkWidget and creates
- * a widget which is just a button. 
+ * a widget which is just a button.
  *
- * Requires: glib >= 2.44, gtk4 >= 4.0.0 
+ * Requires: glib >= 2.44, gtk4 >= 4.0.0
  *
  * This is a template for a FINAL (as opposed to DERIVABLE gobject type.
  * Final types are simpler. You do most of the work in the C file and just
@@ -25,8 +25,8 @@
  * destructors defined below, you'll get an error.
  */
 
-static void demo_widget_dispose (GObject *object);
-static void demo_widget_finalize (GObject *object);
+static void demo_widget_dispose(GObject *object);
+static void demo_widget_finalize(GObject *object);
 
 /* GOBJECT DEFINITION */
 
@@ -36,18 +36,17 @@ static void demo_widget_finalize (GObject *object);
  * by the macros and is expected to be defined here.
  */
 
-struct _DemoWidget
-{
-	/* subclass type - be sure you do *not* use a pointer. Keep this as the
-	 * first member.
-	 */
-	GtkWidget parent_instance;
+struct _DemoWidget {
+  /* subclass type - be sure you do *not* use a pointer. Keep this as the
+   * first member.
+   */
+  GtkWidget parent_instance;
 
-	/* Custom meat and potatoes go here. For now, we are just creating a
-	 * button. Here, you *do* use pointers when you want to incorporate other
-	 * objects in the structure.
-	 */
-	GtkWidget *button;
+  /* Custom meat and potatoes go here. For now, we are just creating a
+   * button. Here, you *do* use pointers when you want to incorporate other
+   * objects in the structure.
+   */
+  GtkWidget *button;
 };
 
 /* once the main struct is defined as above, here is the next macro. Make sure
@@ -58,25 +57,19 @@ struct _DemoWidget
  * G_TYPE_OBJECT for a raw gobject. In this case we're subclassing
  * GtkWidget, so that type macro is specified below.
  */
-G_DEFINE_TYPE (DemoWidget, demo_widget, GTK_TYPE_WIDGET)
+G_DEFINE_TYPE(DemoWidget, demo_widget, GTK_TYPE_WIDGET)
 
+// Helper functions for Zig. Since we don't have access to the DemoWidget data
+// type in Zig and are using an opaque pointer, we need a way to access the
+// internal structure. We do this with getter and setters.
+GtkWidget *demo_widget_get_button(DemoWidget *self) { return self->button; }
+void demo_widget_set_button(DemoWidget *self, GtkWidget *button) {
+  self->button = button;
+}
 
 /* METHOD DEFINITIONS */
 
-/* this function is used to build the widget. Note that although the docs refer
- * to something as the 'instance_init' function, the subroutine is actually
- * named *_init and not *_instance_init. That confused me at first.
- */
-static void
-demo_widget_init (DemoWidget *self)
-{
-	/* Not necessary, but it is a useful shorthand. */
-	GtkWidget *widget = GTK_WIDGET(self);
-
-	self->button = gtk_button_new_with_label ("Hello, world!");
-	gtk_widget_set_hexpand (self->button, TRUE);
-	gtk_widget_set_parent (self->button, widget);
-}
+// The demo_widget_init() function has moved to demowidget.zig.
 
 /* This is one stage of the destructor process along with _finalize.
  * Here, you mostly destruct items that are reference-counted (eg, GObject-y
@@ -94,50 +87,46 @@ demo_widget_init (DemoWidget *self)
  * See also:
  * https://developer-old.gnome.org/gobject/stable/howto-gobject-destruction.html
  */
-static void
-demo_widget_dispose (GObject *object)
-{
-	DemoWidget *self = DEMO_WIDGET(object);
+static void demo_widget_dispose(GObject *object) {
+  DemoWidget *self = DEMO_WIDGET(object);
 
-	/* g_clear_pointer is a very useful function. It calls a function of your
-	 * choice to unref or free a pointer, and then sets that pointer to NULL.
-	 * If it is called on a NULL pointer, it simply does nothing. That allows
-	 * for a perfect way to handle the issue of _dispose being called multiple
-	 * times.
-	 *
-	 * Here, gtk_widget_unparent is the standard GTK function to de-couple
-	 * a child widget from its parent, which unrefs that widget behind the
-	 * scenes.
-	 *
-	 * Note that g_clear_pointer takes a pointer *to* a gpointer, and not a
-	 * straight gpointer. That is necessary for the function to NULL-ify the
-	 * pointer.
-	 */
-	g_clear_pointer (&self->button, gtk_widget_unparent);
+  /* g_clear_pointer is a very useful function. It calls a function of your
+   * choice to unref or free a pointer, and then sets that pointer to NULL.
+   * If it is called on a NULL pointer, it simply does nothing. That allows
+   * for a perfect way to handle the issue of _dispose being called multiple
+   * times.
+   *
+   * Here, gtk_widget_unparent is the standard GTK function to de-couple
+   * a child widget from its parent, which unrefs that widget behind the
+   * scenes.
+   *
+   * Note that g_clear_pointer takes a pointer *to* a gpointer, and not a
+   * straight gpointer. That is necessary for the function to NULL-ify the
+   * pointer.
+   */
+  g_clear_pointer(&self->button, gtk_widget_unparent);
 
-	/* Final step: Chain up (boilerplate)
-	 *
-	 * This is called `chaining up' by the gobject docs. *_parent_class
-	 * is auto-generated by the macros - acc. to gtype.h, it's a static
-	 * variable pointing to the parent class.
-	 */
-	G_OBJECT_CLASS(demo_widget_parent_class)->dispose (object);
+  /* Final step: Chain up (boilerplate)
+   *
+   * This is called `chaining up' by the gobject docs. *_parent_class
+   * is auto-generated by the macros - acc. to gtype.h, it's a static
+   * variable pointing to the parent class.
+   */
+  G_OBJECT_CLASS(demo_widget_parent_class)->dispose(object);
 }
 
 /* Second and final stage of the destruction process. See _finalize above for
  * more info. We don't have anything to put in here yet, but we include it for
  * posterity and for easy addition later; so we just manually chain up for now.
  */
-static void
-demo_widget_finalize (GObject *object)
-{
-	/* --- */
+static void demo_widget_finalize(GObject *object) {
+  /* --- */
 
-	/* Always chain up to the parent class; as with dispose(), finalize() is
-	 * autogenerated and thus always guaranteed to exist on the parent's class
-	 * virtual function table
-	 */
-	G_OBJECT_CLASS(demo_widget_parent_class)->finalize(object);
+  /* Always chain up to the parent class; as with dispose(), finalize() is
+   * autogenerated and thus always guaranteed to exist on the parent's class
+   * virtual function table
+   */
+  G_OBJECT_CLASS(demo_widget_parent_class)->finalize(object);
 }
 
 /* this method gets run the first time the class is *ever* utilized but not
@@ -153,23 +142,21 @@ demo_widget_finalize (GObject *object)
  * like, but it has idiomatically been called 'klass' for 20+ years, so it's
  * probably best to just stick with that.
  */
-static void
-demo_widget_class_init (DemoWidgetClass *klass)
-{
-	/* Establish a shorthand to avoid some casts. */
-	GObjectClass *object_class = G_OBJECT_CLASS(klass);
+static void demo_widget_class_init(DemoWidgetClass *klass) {
+  /* Establish a shorthand to avoid some casts. */
+  GObjectClass *object_class = G_OBJECT_CLASS(klass);
 
-	/* Map the dispose and finalize 'virtual functions' to the functions
-	 * we defined above.
-	 */
-	object_class->dispose = demo_widget_dispose;
-	object_class->finalize = demo_widget_finalize;
+  /* Map the dispose and finalize 'virtual functions' to the functions
+   * we defined above.
+   */
+  object_class->dispose = demo_widget_dispose;
+  object_class->finalize = demo_widget_finalize;
 
-	/* Tell our widget which type of 'layout manager' to use so it knows
-	 * how to arrange the widgets. Box type is a good default.
-	 */
-	gtk_widget_class_set_layout_manager_type (GTK_WIDGET_CLASS(klass),
-			GTK_TYPE_BOX_LAYOUT);
+  /* Tell our widget which type of 'layout manager' to use so it knows
+   * how to arrange the widgets. Box type is a good default.
+   */
+  gtk_widget_class_set_layout_manager_type(GTK_WIDGET_CLASS(klass),
+                                           GTK_TYPE_BOX_LAYOUT);
 }
 
 /* and finally, here's the actual definition of our public function to create
@@ -180,8 +167,6 @@ demo_widget_class_init (DemoWidgetClass *klass)
  * we don't have any properties we're going to instantiate, we just pass NULL
  * after the GType. We'll discuss GObject properties later on.
  */
-GtkWidget *
-demo_widget_new (void)
-{
-	return g_object_new (DEMO_TYPE_WIDGET, NULL);
+GtkWidget *demo_widget_new(void) {
+  return g_object_new(DEMO_TYPE_WIDGET, NULL);
 }
