@@ -16,7 +16,15 @@ Zig data types carry extra information (like alignment) compared to C so it isn'
 
 That said, the idea is to convert as much C code to Zig while retaining sanity:
 
-- [x] `youtube-tutorial/1`: moved `demo_widget_init()` and `demo_widget_dispose()` to `demowidget.zig`. These are `DemoWidget`'s main "heavy-lifting" methods (if we stick with the OOP metaphor) that aren't just boilerplate code. I don't think there's any point in battling Zig's type system to get the other methods implemented in Zig.
+- [x] `youtube-tutorial/1`. The custom method (if we stick with the OOP metaphor) implementations are moved to `demowidget.zig`. These are all under an opaque type called `DemoWidget` exposing a canonical Zig function-calling scheme.
+
+  - `demo_widget_init()`.
+  - `demo_widget_dispose()`.
+  - `demo_widget_finalize()`.
+  - `demo_widget_class_init()`.
+  - A public "ziggified" version of `demo_widget_new()` to `DemoWidget.new()`.
+  - Helper "ziggified" functions for internal use: `DemoWidget.get_parent_class()`, `DemoWidget.get_button()`, `DemoWidget.set_button()`. These are required because `DemoWidget` is an opaque type, and we can't access fields directly. The setter/getter implementation is on the C side in `demowidget.c`.
+
 - [ ] `youtube-tutorial/2`
 - [ ] `youtube-tutorial/3`
 - [ ] `youtube-tutorial/4`
