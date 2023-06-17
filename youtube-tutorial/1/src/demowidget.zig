@@ -21,6 +21,7 @@ pub const DemoWidget = opaque {
 
     // We can't directly use the GTK4-way c.DEMO_TYPE_WIDGET macro.
     extern fn demo_widget_get_type() c.GType;
+    const get_type = demo_widget_get_type;
 
     // this function is used to build the widget. Note that although the docs refer
     // to something as the 'instance_init' function, the subroutine is actually
@@ -122,9 +123,6 @@ pub const DemoWidget = opaque {
     // we don't have any properties we're going to instantiate, we just pass NULL
     // after the GType. We'll discuss GObject properties later on.
     pub fn new() ?*c.GtkWidget {
-        return alignPtrCast(
-            ?*c.GtkWidget,
-            c.g_object_new(demo_widget_get_type(), null),
-        );
+        return alignPtrCast(?*c.GtkWidget, c.g_object_new(get_type(), null));
     }
 };
