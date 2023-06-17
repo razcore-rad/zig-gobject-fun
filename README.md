@@ -8,11 +8,11 @@
 
 Unfortunately Zig isn't capable of translating complex C code that heavily relies on macros like [GTK4](https://gtk.org). Because of this, we aren't able to create custom widgets in a simple fashion.
 
-The compromise I'm using is to create the boilerplate code in C that exposes the `*_init()` function to Zig so we can work on the implementation in Zig. These are then used as object files we add to the compiler.
+The compromise I'm using is to create the boilerplate code in C while implementing the "heavy-lifting" methods in Zig.
 
 ## Status
 
-Zig data types carry extra information compared to C so it isn't trivial to use C pointer types directly in Zig. A lot of explicit casting has to take place, which in fairness happens in C as well, but the GTK4 macros masks out most of this noise.
+Zig data types carry extra information (like alignment) compared to C so it isn't trivial to use C pointer types directly in Zig. A lot of explicit casting has to take place, which in fairness happens in C as well, but the GTK4 macros masks out most of this noise.
 
 That said, the idea is to convert as much C code to Zig while retaining sanity:
 
