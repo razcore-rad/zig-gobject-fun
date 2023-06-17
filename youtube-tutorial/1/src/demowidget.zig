@@ -36,6 +36,27 @@ pub const DemoWidget = opaque {
         }
     }
 
+    //  this method gets run the first time the class is *ever* utilized but not
+    //  again.
+    //
+    //  See:
+    //  https://developer-old.gnome.org/gobject/stable/howto-gobject-destruction.html
+    //  for more info on what you need to put in this subroutine re: destructors.
+    //
+    //  Note: I kept getting confused about what 'klass' meant and why it's spelled
+    //  that way. It is just to avoid using the token 'class' on its own which is a
+    //  c++ reserved word. You could call it something else like 'gclass' if you'd
+    //  like, but it has idiomatically been called 'klass' for 20+ years, so it's
+    //  probably best to just stick with that.
+    export fn demo_widget_class_init(class: *c.DemoWidgetClass) void {
+        const object_class = alignPtrCast(*c.GObjectClass, class);
+        object_class.dispose = &demo_widget_dispose;
+        object_class.finalize = &demo_widget_finalize;
+
+        const widget_class = alignPtrCast(*c.GtkWidgetClass, class);
+        c.gtk_widget_class_set_layout_manager_type(widget_class, c.gtk_box_layout_get_type());
+    }
+
     // This is one stage of the destructor process along with _finalize.
     // Here, you mostly destruct items that are reference-counted (eg, GObject-y
     // stuff) as opposed to not (like a string, or a FILE * pointer, which should
@@ -48,7 +69,7 @@ pub const DemoWidget = opaque {
     // with this correctly.
     // See also:
     // https://developer-old.gnome.org/gobject/stable/howto-gobject-destruction.html
-    export fn demo_widget_dispose(optional_object: ?*c.GObject) void {
+    fn demo_widget_dispose(optional_object: ?*c.GObject) callconv(.C) void {
         const optional_self = @ptrCast(?*Self, optional_object);
         if (optional_self) |self| {
             var button = self.get_button();
@@ -82,7 +103,7 @@ pub const DemoWidget = opaque {
     // Second and final stage of the destruction process. See _finalize above for
     // more info. We don't have anything to put in here yet, but we include it for
     // posterity and for easy addition later; so we just manually chain up for now.
-    export fn demo_widget_finalize(optional_object: ?*c.GObject) void {
+    fn demo_widget_finalize(optional_object: ?*c.GObject) callconv(.C) void {
         //
 
         // Always chain up to the parent class; as with dispose(), finalize() is
@@ -92,27 +113,6 @@ pub const DemoWidget = opaque {
         if (alignPtrCast(*c.GObjectClass, get_parent_class()).finalize) |finalize| {
             finalize(optional_object);
         }
-    }
-
-    //  this method gets run the first time the class is *ever* utilized but not
-    //  again.
-    //
-    //  See:
-    //  https://developer-old.gnome.org/gobject/stable/howto-gobject-destruction.html
-    //  for more info on what you need to put in this subroutine re: destructors.
-    //
-    //  Note: I kept getting confused about what 'klass' meant and why it's spelled
-    //  that way. It is just to avoid using the token 'class' on its own which is a
-    //  c++ reserved word. You could call it something else like 'gclass' if you'd
-    //  like, but it has idiomatically been called 'klass' for 20+ years, so it's
-    //  probably best to just stick with that.
-    export fn demo_widget_class_init(class: *c.DemoWidgetClass) void {
-        const object_class = alignPtrCast(*c.GObjectClass, class);
-        object_class.dispose = &demo_widget_dispose;
-        object_class.finalize = &demo_widget_finalize;
-
-        const widget_class = alignPtrCast(*c.GtkWidgetClass, class);
-        c.gtk_widget_class_set_layout_manager_type(widget_class, c.gtk_box_layout_get_type());
     }
 
     // and finally, here's the actual definition of our public function to create
