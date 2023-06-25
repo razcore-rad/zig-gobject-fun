@@ -25,11 +25,19 @@ That said, the idea is to convert as much C code to Zig while retaining sanity:
   - A public "ziggified" version of `demo_widget_new()` to `DemoWidget.new()`.
   - Helper "ziggified" functions for internal use: `DemoWidget.get_parent_class()`, `DemoWidget.get_button()`, `DemoWidget.set_button()`. These are required because `DemoWidget` is an opaque type, and we can't access fields directly. The setter/getter implementation is on the C side in `demowidget.c`.
 
-- [ ] `youtube-tutorial/2`
-- [ ] `youtube-tutorial/3`
-- [ ] `youtube-tutorial/4`
+- [x] `youtube-tutorial/2`
+- [x] `youtube-tutorial/3`
+- [x] `youtube-tutorial/4`. At this point I determined that there is wayyyyyy too much hassle dealing with explicit casts that need to happen on almost every line of code so using GTK4 via `translate-c` is impractical. We should wait for some awesome people to create actual Zig bindings.
 - [ ] `youtube-tutorial/5`
 - [ ] `youtube-tutorial/6`
+
+### Conclusion
+
+Although I learned a lot about Zig during this experiment I would not advise anyone to interoperate with C via `translate-c` directly when dealing with complex libraries like GTK4.
+
+The only practical application for `translate-c` is for libraries that generate bindings really, anything more get too complex because of explicit casting needed at almost every line.
+
+I'm keeping this repo around as a showcase.
 
 ## Building
 
